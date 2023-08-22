@@ -63,3 +63,8 @@ colab_data/
 
 # json
 *.json
+
+
+# 중요내용
+./secret.txt
+./requirements.txt
