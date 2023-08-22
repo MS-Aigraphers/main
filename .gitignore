@@ -1,0 +1,65 @@
+# PDF
+*.pdf
+
+# ZIP
+*.zip
+*.tar.gz
+*.gz
+*.ubyte
+*.tar
+
+
+# h5
+*.h5
+
+#ppt
+*.ppt
+*.pptx
+
+# 설치파일 
+*.dmg
+*.exe
+
+
+# 사진
+*.png
+*.jpg
+*.jpeg
+*.dng
+
+
+# 영상
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.webm
+
+#음악
+*.wav
+
+
+# Part 3 AI with Django
+0. install file (Atom & Mobirise4)/
+Part 3 AI with Django/
+
+# 3-2 네이버 쇼핑리뷰감성 
+colab_data/
+
+# 다운로드된 파일 이그놀
+*ubyte*
+*batches-py*
+*pth*
+
+# txt
+*.txt
+*.xml
+*.DS_Store*
+
+# 학습파일
+*.pt
+
+# json
+*.json
