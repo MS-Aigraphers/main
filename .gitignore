@@ -40,21 +40,12 @@
 #음악
 *.wav
 
-
-# Part 3 AI with Django
-0. install file (Atom & Mobirise4)/
-Part 3 AI with Django/
-
-# 3-2 네이버 쇼핑리뷰감성 
-colab_data/
-
 # 다운로드된 파일 이그놀
 *ubyte*
 *batches-py*
 *pth*
 
 # txt
-*.txt
 *.xml
 *.DS_Store*
 
@@ -66,4 +57,4 @@ colab_data/
 
 
 # 중요내용
-./secret.txt
+secret.txt

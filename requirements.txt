@@ -1,0 +1,9 @@
+pandas
+numpy
+torch 
+torchvision
+django
+mysqlclient
+pillow
+tqdm
+albumentations
