@@ -1,6 +1,3 @@
-# 기본적인 Augmentation은 YOLO ultralytics에서 제공됩니다.
-# 해당 코드는 별도의 Augmentation이 더 필요하다고 가정할 때 label 정보도 이미지와 함께 움직여주는 기능을 수행합니다.
-
 import cv2
 import os
 import imgaug.augmenters as iaa
@@ -32,6 +29,12 @@ def write_yolo_label(label_path, bbox_list):
             line = f"{bbox['class_idx']} {bbox['x_center']} {bbox['y_center']} {bbox['width']} {bbox['height']}\n"
             f.write(line)
 
+def yolo_bbox_from_imgaug(imgaug_bbox, image_shape):
+    x_center = (imgaug_bbox.x1 + imgaug_bbox.x2) / (2 * image_shape[1])
+    y_center = (imgaug_bbox.y1 + imgaug_bbox.y2) / (2 * image_shape[0])
+    width = (imgaug_bbox.x2 - imgaug_bbox.x1) / image_shape[1]
+    height = (imgaug_bbox.y2 - imgaug_bbox.y1) / image_shape[0]
+    return {'class_idx': imgaug_bbox.label, 'x_center': x_center, 'y_center': y_center, 'width': width, 'height': height}
 
 # YOLO 형식의 bbox 정보를 imgaug의 BoundingBox로 변환하는 함수
 def yolo_bbox_to_imgaug(yolo_bbox, image_shape):
@@ -49,11 +52,10 @@ augmentation_seq = iaa.Sequential([
 ])
 
 # 입력 이미지와 라벨 디렉토리 설정
-# 이 부분은 디렉토리 경로를 맞게 설정해주시면 됩니다.
-image_dir = 
-aug_image_dir =     #augmentation 이미지 저장할 폴더
-label_dir = 
-aug_label_dir =     #augmentation 라벨 저장할 폴더
+image_dir = './ultralytics/cfg/yolo_dataset/train/images'
+aug_image_dir = 'ultralytics/cfg/augmented_dataset/train/images'
+label_dir = './ultralytics/cfg/yolo_dataset/train/labels'
+aug_label_dir = 'ultralytics/cfg/augmented_dataset/train/labels'
 
 # 이미지와 라벨 파일 목록 가져오기
 image_files = os.listdir(image_dir)
@@ -80,8 +82,8 @@ for image_file in image_files:
         image_aug, bbs_aug = augmentation_seq(image=image, bounding_boxes=bbs_aug)
 
         # 변경된 bbox 정보를 라벨 파일에 저장
-        bbox_list_aug = [{'class_idx': bbox.label, 'x_center': bbox.x1, 'y_center': bbox.y1, 'width': bbox.x2 - bbox.x1, 'height': bbox.y2 - bbox.y1} for bbox in bbs_aug]
-        write_yolo_label(aug_label_path, bbox_list_aug)
+        bbox_list_aug_yolo = [yolo_bbox_from_imgaug(bbox, (image_width, image_height)) for bbox in bbs_aug]
+        write_yolo_label(aug_label_path, bbox_list_aug_yolo)
 
         # 변경된 이미지를 저장
         cv2.imwrite(os.path.join(aug_image_dir, f"{image_file}"), image_aug)
