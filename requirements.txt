@@ -1,9 +1,21 @@
-pandas
-numpy
-torch 
-torchvision
-django
-mysqlclient
-pillow
-tqdm
-albumentations
+pandas==2.0.3
+numpy==1.25.2
+torch==2.0.1
+torchvision==0.15.2
+django==4.2.4
+pillow==10.0.0
+tqdm==4.66.1
+albumentations==1.3.1
+
+# 가상환경 생성 및 패키지 설치
+
+git init
+git remote add origin https://github.com/MS-Aigraphers/main.git
+git clone https://github.com/MS-Aigraphers/main.git
+
+
+conda create -n Aigraphers python=3.11
+conda activate Aigraphers
+pip install -r requirements.txt
+
+```
