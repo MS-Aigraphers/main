@@ -1,12 +1,15 @@
+import requests
 import threading
 import time
 
 
 
 # def CrossLineCheck()   라인설정
+# 객체가 탐지가 일어나면 시작
 # a : 사람 아래 box가 가상의 선을 a -> b 순서로 지나가면(a를 먼저터치) in 반환
 # b : 사람 아래 box가 가상의 선을 b -> a 순서로 지나가면(b를 먼저터치) out 반환
 # 사람 윗박스 좌표 및 아래박스 좌표로 해서 가상의 선에 윗박스 찍고 아래박스 찍으면 out 으로 생각할 수도 있음
+# 객체가 탐지가 일어나면 시작
 
 # def ObjectMoveCheck()   사람과 물건이 함께 움직이는지
 # a : 사람 box와 물건 box의 거리가 x거리 이내인지 확인 (거리는 정해야함)
@@ -14,9 +17,8 @@ import time
 
 # def CountObject()
 # a : def KioskZoneEnter() true일 경우 상품의 box 카운트값 x에 저장
-# b : x초단위로 savecount변수에 최대카운트값 저장
+# b : x초 단위로 savecount변수에 최대카운트값 저장
 # c : CrossLineCheck() out 반환하면 로직 종료
-
 
 
 # 1.  def KioskZoneEnter()  키오스크존 진입 로직  (1번 카메라에 사람과 물건을 인식한다)
@@ -29,7 +31,7 @@ import time
 # 2-a : def KioskZoneEnter() 에서 true 및 CrossLineCheck()에서 out을 반환하면 def PaymentTryCheck() 시작
 # 2-b : 키오스크 DB로 쿼리문 실행 로직 시작
 # 2-c : 쿼리문으로 키오스크의 결제시간(time) 빼오기
-# 2-d : 빼온 time값이 1-b time과 CrossLineCheck()에서 out을 반환한 시간사이의 결제시도비교하여  (가상의 테이블)
+# 2-d : 빼온 time값이 1-b time과 CrossLineCheck()에서 out을 반환한 시간사이의 결제시도 비교하여  (가상의 테이블)
 # 2-e : 로그가 있으면 True 반환 및 def PaymentTryCheck() 종료
 # 2-f : 로그가 없으면 alert 실행 및 def PaymentTryCheck() 종료
 
@@ -40,10 +42,19 @@ import time
 # 3-d : 빼온 사물개수와 3-b의 savecount 비교하여 같거나 많으면 True 반환 및 def CountObjectFromDB() 종료
 # 3-e : 빼온 사물개수와 3-b의 savecount 비교하여 적으면 alert 실행 및 def CountObjectFromDB() 종료
 
+# 생각해봐야할 문제
+# 사람 카운팅 할것인가?
+# 로직의 시작시간과 끝시간에 대한 분명한 기준을 세워야하는가?
+# 여러명일때 정상적으로 체킹이 가능한가?
+# 예외적인 부분은 어떤것들이 있을까?
+
+
+
+
 
 
 ## 객체 탐지기 클래스
-import requests
+
 import time
 
 # Define your API credentials or access token
