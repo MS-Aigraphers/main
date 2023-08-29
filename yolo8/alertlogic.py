@@ -10,14 +10,9 @@ from baselogic import  *
 # 1-a : ObjectMoveCheck() true 반환시 키오스크존 진입 로직 시작
 # 1-b : 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
 # 1-c : 키오스크에 10초이상 있으면 키오스크 return True 및
-# 1-d : start.time() 실행 없이 CrossLineCheck()에서 out 반환시 alert 실행 후 진입 로직 종료
+# 1-d : start.time() 실행 없이 crosslinecheck()에서 out 반환시 alert 실행 후 진입 로직 종료
 def kioskzoneenter(iou) :
-    result = crosslinecheck()
-    if iou >= 0.8 :
-        start_time = time.time() # start.time() 시작
 
-    elif result == "out" :
-            alert()
 
     # 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
 
