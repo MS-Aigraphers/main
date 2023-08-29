@@ -1,24 +1,9 @@
 import requests
 import threading
 import time
-
-
-
-# def CrossLineCheck()   라인설정
-# 객체가 탐지가 일어나면 시작
-# a : 사람 아래 box가 가상의 선을 a -> b 순서로 지나가면(a를 먼저터치) in 반환
-# b : 사람 아래 box가 가상의 선을 b -> a 순서로 지나가면(b를 먼저터치) out 반환
-# 사람 윗박스 좌표 및 아래박스 좌표로 해서 가상의 선에 윗박스 찍고 아래박스 찍으면 out 으로 생각할 수도 있음
-# 객체가 탐지가 일어나면 시작
-
-# def ObjectMoveCheck()   사람과 물건이 함께 움직이는지
-# a : 사람 box와 물건 box의 거리가 x거리 이내인지 확인 (거리는 정해야함)
-# b : 사람 box와 물건 box의 거리가 x거리 이내이면서 y초간 지속되었으면 True 반환
-
-# def CountObject()
-# a : def KioskZoneEnter() true일 경우 상품의 box 카운트값 x에 저장
-# b : x초 단위로 savecount변수에 최대카운트값 저장
-# c : CrossLineCheck() out 반환하면 로직 종료
+from web.kakao import *      # web에 있는 kakao.py에서 모든 함수를 가져옴
+from web.manage import *     # web에 있는 manage.py에서 모든 함수를 가져옴
+from baselogic import  *
 
 
 # 1.  def KioskZoneEnter()  키오스크존 진입 로직  (1번 카메라에 사람과 물건을 인식한다)
@@ -26,6 +11,18 @@ import time
 # 1-b : 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
 # 1-c : 키오스크에 10초이상 있으면 키오스크 return True 및
 # 1-d : start.time() 실행 없이 CrossLineCheck()에서 out 반환시 alert 실행 후 진입 로직 종료
+def kioskzoneenter(iou) :
+    result = crosslinecheck()
+    if iou >= 0.8 :
+        start_time = time.time() # start.time() 시작
+
+    elif result == "out" :
+            alert()
+
+    # 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
+
+    # 키오스크에 10초이상 있으면 키오스크 return True 및
+    pass
 
 # 2.   def PaymentTryCheck()  결제시도체크 로직
 # 2-a : def KioskZoneEnter() 에서 true 및 CrossLineCheck()에서 out을 반환하면 def PaymentTryCheck() 시작
@@ -35,12 +32,26 @@ import time
 # 2-e : 로그가 있으면 True 반환 및 def PaymentTryCheck() 종료
 # 2-f : 로그가 없으면 alert 실행 및 def PaymentTryCheck() 종료
 
+def paymenttrycheck():
+    # 2-b 쿼리날리기
+    # 2-c 쿼리결과값 받아오기
+    # payment_time_fromDB = 쿼리문을 통해 받은 결제시간
+    # 2-d 결제시도시간과 결제시간 비교
+    # payment_time
+        pass
+
+
+# f_send_talk(token, text)
+
 # 3. def CountObjectFromDB()  사물개수비교
 # 3-a : def PaymentTryCheck() 에서 True 반환시 def CountObjectFromDB() 시작
 # 3-b : CountObject()의 savecount 숫자가져오기
 # 3-c : 키오스크 DB로 쿼리문 실행으로 키오스크의 사물개수 빼오기
 # 3-d : 빼온 사물개수와 3-b의 savecount 비교하여 같거나 많으면 True 반환 및 def CountObjectFromDB() 종료
 # 3-e : 빼온 사물개수와 3-b의 savecount 비교하여 적으면 alert 실행 및 def CountObjectFromDB() 종료
+
+def countobjectfromDB() :
+    pass
 
 # 생각해봐야할 문제
 # 사람 카운팅 할것인가?
