@@ -1,0 +1,7 @@
+0 : Human
+1 : Ice_cream
+2 : Snack
+3 : Drink
+4 : Ramen
+5 : Bag
+6 : Weapon
