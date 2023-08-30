@@ -139,11 +139,6 @@ def collate_fn(batch):
 
     return images, transformed_targets_list
 
-
-
-
-
-
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
 val_dataloader = DataLoader(val_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
 
@@ -156,10 +151,9 @@ def get_model(num_classes):
 
     # Define the number of anchor boxes and their sizes
     rpn_anchor_generator = AnchorGenerator(
-        sizes=((32, 64, 128, 256, 512),),
+        sizes=((32,), (64,), (128,), (256,), (512,)),
         aspect_ratios=((0.5, 1.0, 2.0),) * 5
     )
-
     # Create the Faster R-CNN model
     model = FasterRCNN(
         backbone,
@@ -244,7 +238,6 @@ for epoch in range(num_epochs):
             val_mAP /= count
 
         print(f"Validation mAP: {val_mAP}")
-
 
         if val_mAP > best_mAP:
             best_mAP = val_mAP
