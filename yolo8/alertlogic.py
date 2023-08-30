@@ -1,9 +1,14 @@
-import requests
-import threading
-import time
 from web.kakao import *      # web에 있는 kakao.py에서 모든 함수를 가져옴
 from web.manage import *     # web에 있는 manage.py에서 모든 함수를 가져옴
-from baselogic import  *
+from baselogic import *
+from django.http import JsonResponse
+
+from datetime import datetime
+from requests import request
+from django.utils import timezone
+from datetime import datetime
+import threading
+import time
 
 
 # 1.  def KioskZoneEnter()  키오스크존 진입 로직  (1번 카메라에 사람과 물건을 인식한다)
@@ -11,13 +16,45 @@ from baselogic import  *
 # 1-b : 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
 # 1-c : 키오스크에 10초이상 있으면 키오스크 return True 및
 # 1-d : start.time() 실행 없이 crosslinecheck()에서 out 반환시 alert 실행 후 진입 로직 종료
-def kioskzoneenter(iou) :
+
+global start_time
+start_time = datetime.now()
+def kiosk_zone_enter(iou: float):
+    result = False
+    date_format = '%Y.%m.%d.%H.%M.%S'
+
+    # IOU 80%가 넘는지 확인
+    if iou >= 80:
+        # 키오스크존에 진입 시간 기록
+        start_time = datetime.now()
+
+        while True:
+            end_time_str = request.GET.get('IOU_time', None)  # IOU에서 전달되는 값으로 판단하는 것 같습니다.
+            if end_time_str is not None:
+                end_time = datetime.strptime(end_time_str, date_format)
+
+                # 키오스크에 10초 이상 머무르는지 확인
+                if (end_time - start_time).seconds >= 10:
+                    result = True
+                    break
+                else:
+                    kakao_alert(txt="키오스크에 10초 이상 머물지 않았습니다.")
+                    break  # 10초 미만 머무른 경우에도 반복문 탈출
+            else:
+                # IOU_time 값이 전달되지 않은 경우에 대한 처리
+                # 필요한 로직을 추가해야 합니다.
+                pass
+
+            time.sleep(1)
+    else:
+        raise Exception("IOU 값이 80% 미만입니다.")
+
+    return result
 
 
     # 키오스크로 존에 IOU가 80프로 이상 겹치면 time 로그 찍고 start.time() 시작
-
     # 키오스크에 10초이상 있으면 키오스크 return True 및
-    pass
+
 
 # 2.   def PaymentTryCheck()  결제시도체크 로직
 # 2-a : def KioskZoneEnter() 에서 true 및 CrossLineCheck()에서 out을 반환하면 def PaymentTryCheck() 시작
@@ -35,6 +72,9 @@ def paymenttrycheck():
     # payment_time
         pass
 
+
+# DB 값 3개
+# 1. 시간(우리가 임의로), 개수,
 
 # f_send_talk(token, text)
 
