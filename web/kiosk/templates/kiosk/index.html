@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kiosk</title>
+</head>
+<body>
+    <h1>Kiosk</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="objectcount">Object Count:</label>
+        <input type="number" name="objectcount" id="objectcount">
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
