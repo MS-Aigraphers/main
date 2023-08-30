@@ -64,10 +64,12 @@ while True:
         (x, y, x2, y2) = bbox
         class_name = class_names[cls]
         confidence = result_detect.boxes.conf[i]
-        if confidence < 0.5 :
-            continue
         if class_name == 'Weapon' :
-            count += 1
+            if confidence < 0.3 :
+                continue
+        else :
+            if confidence <0.5 :
+                continue
         cv2.rectangle(frame, (x, y), (x2, y2), (0, 0, 225), 2)
         cv2.putText(frame, f'{class_name} ({confidence:.2f})', (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 225), 2)
         
