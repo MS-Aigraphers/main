@@ -1,0 +1,2 @@
+rest_api_key=‘257053bc769d168f034099c30786cfcf’
+authorize_code=‘aA0Dqz3NpLkeDWmzNt7NIRstt_D_WabOCAW3r5G6QRW0Q_11az4uQp92z5p0iukUpycsDgoqJZAAAAGKSkmziA’
