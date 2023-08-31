@@ -1,0 +1,2 @@
+rest_api_key=cbbbeb1d794fce0315e1ddb754fd070d
+authorize_code=vaGqI8kwdgvMPWkYTrrLREGhpSB0HCCGRDBis7o8e51H5agiMuVv7dI6k0i8RXLwzT86lAoqJU8AAAGKSqHxOQ

@@ -52,11 +52,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'accounts',
     'home',
     'kiosk',
 ]
-
+CRONJOBS = [
+    ('*/1 * * * *', 'kiosk.tasks.fetch_data'),  # 매 분마다 실행
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

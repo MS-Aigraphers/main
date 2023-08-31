@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kiosk Data</title>
+</head>
+<body>
+    <h1>Kiosk Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Object Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in kiosk_data %}
+                <tr>
+                    <td>{{ data.time }}</td>
+                    <td>{{ data.objectcount }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

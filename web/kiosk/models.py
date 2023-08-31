@@ -9,3 +9,5 @@ class Kiosk(models.Model):
     
     class Meta:
         db_table = 'Kiosk'  # 원하는 테이블명을 설정합니다.
+
+    

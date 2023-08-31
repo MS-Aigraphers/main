@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Added Page</title>
+</head>
+<body>
+    <h1>Data Added</h1>
+    <ul>
+        {% for data in kiosk_data %}
+            <li>{{ data.time }} - Objects: {{ data.objectcount }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'data_added' %}">Add Data</a>
+</body>
+</html>
