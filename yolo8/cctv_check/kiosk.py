@@ -1,8 +1,11 @@
 import time
 import cv2
 
-def kioskzoneenter(frame, iou, fps, width,paying_threshold):
-    iou_threshold = 0.4
+
+
+
+def kioskzoneenter(frame, iou, fps, width,paying_threshold,iou_threshold):
+
     time_threshold = 20.0
 
 
@@ -26,6 +29,32 @@ def kioskzoneenter(frame, iou, fps, width,paying_threshold):
         kioskzoneenter.start_time = None
 
     return False, 0
+
+
+def countobject(x,y,count_coords,class_name,object_counts_frame,object_detected) :
+
+    if count_coords[0][0] < x < count_coords[2][0] and count_coords[0][1] < y < count_coords[2][1]:
+
+        if class_name == "1 : Ice_cream":
+            object_counts_frame['Ice_cream'] = object_counts_frame.get('Ice_cream', 0) + 1
+            return True
+        
+        elif class_name == "2 : Snack":
+            object_counts_frame['Snack'] = object_counts_frame.get('Snack', 0) + 1
+            return True
+        
+        elif class_name == "3 : Drink":
+            object_counts_frame['Drink'] = object_counts_frame.get('Drink', 0) + 1
+            return True
+        
+        elif class_name == "4 : Ramen":
+            object_counts_frame['Ramen'] = object_counts_frame.get('Ramen', 0) + 1
+            return True
+        
+    return False
+
+
+
 
 
 
