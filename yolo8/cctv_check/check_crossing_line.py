@@ -1,6 +1,8 @@
+from datetime import datetime
 
 def check_crossing_line(prev_bboxes, curr_bboxes, line_y):
     crossed_above_to_below = False
+    exit_time = None  # Initialize variable to store the exit time
     crossed_below_to_above = False
     
     for prev_bbox, curr_bbox in zip(prev_bboxes, curr_bboxes):
@@ -19,4 +21,9 @@ def check_crossing_line(prev_bboxes, curr_bboxes, line_y):
             if prev_center_y > line_y and curr_center_y <= line_y:
                 crossed_below_to_above = True
     
-    return crossed_above_to_below, crossed_below_to_above
+    
+    # Capture the current time as exit time when an object crosses from below to above
+    if crossed_below_to_above:
+        exit_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    return crossed_above_to_below, crossed_below_to_above, exit_time
