@@ -21,6 +21,7 @@ import time
 # 2-e : 로그가 있으면 True 반환 및 def PaymentTryCheck() 종료
 # 2-f : 로그가 없으면 alert 실행 및 def PaymentTryCheck() 종료
 
+# TODO 모델단에서 어떤식으로 데이터를 던질지 같이 생각해봐야함
 def payment_try_check(iou50_10:datetime, payment_time_fromDB:datetime, exit_time:datetime) -> bool:
     # 2-d 결제시도시간과 결제시간 비교
     if iou50_10 < payment_time_fromDB < exit_time:
@@ -28,7 +29,9 @@ def payment_try_check(iou50_10:datetime, payment_time_fromDB:datetime, exit_time
         result = True
     else:
         print(" XXXX 결제시도 로그가 없습니다.")
+        kakao_alert(time=datetime.datetime.now(), txt="결제시도가 없습니다.")
         result = False
+
     return result
 
 
@@ -38,15 +41,20 @@ def payment_try_check(iou50_10:datetime, payment_time_fromDB:datetime, exit_time
 # 3-c : 키오스크 DB로 쿼리문 실행으로 키오스크의 사물개수 빼오기
 # 3-d : 빼온 사물개수와 3-b의 savecount 비교하여 같거나 많으면 True 반환 및 def CountObjectFromDB() 종료
 # 3-e : 빼온 사물개수와 3-b의 savecount 비교하여 적으면 alert 실행 및 def CountObjectFromDB() 종료
-
+# TODO 객체탐지 모델과 DB 동시에 불러와야함 / input으로 받을것인가? 파라미터를 그냥 불러올것인가?
 def count_object_from_DB(obj_cnt:int, obj_cnt_fromDB:int) -> bool:
+    # obj_cnt = kiosk_views.소지한물건갯수_메소드  # 소지하고 있는 물건의 갯수
+    # obj_cnt_fromDB = kiosk_views.바코드물건갯수_메소드  # 바코드에 찍힌 물건의 갯수
     # DB views.py에서 obj_cnt_fromDB를 가져오는 방법은 ?
     if obj_cnt >= obj_cnt_fromDB:
-        result = True
         print(" OOOO  카운트가 정상 범위입니다.")
+        result = True
     else:
         print(" XXXX  카운트가 비정상 범위입니다.")
         result = False
+        kakao_alert(time=datetime.datetime.now(), txt="카운트에 문제가 있습니다.")
+
+
     return result
 
 # 생각해봐야할 문제
@@ -55,6 +63,7 @@ def count_object_from_DB(obj_cnt:int, obj_cnt_fromDB:int) -> bool:
 # 여러명일때 정상적으로 체킹이 가능한가?
 # 예외적인 부분은 어떤것들이 있을까?
 
-def kakao_alert(txt) :
+def kakao_alert(time, txt) :
     # 0831 작업 중
+    # 백단에서 승훈 카톡api랑 연결중 0901 백단에서 코드 수정 중
     pass
