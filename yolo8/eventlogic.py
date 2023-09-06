@@ -61,7 +61,7 @@ if __name__ == "__main__":
         print(f"이탈 시간 : {exit_time}")
         txt = "키오스크존에서 10초 이상 머물지 않았습니다."
         raise Exception(txt)
-        # kakao_alert(time=datetime.datetime.now(), txt=txt)
+        # kakao_alert(time=exit_time, txt=txt)
 
     # 결제 시도 내역 판단 Logic
     iou50_10 = kiosk_views.IOU_10초유지_메소드  # IOU 50% 10초 이상 유지에 성공한 시각 TODO : 데이터 변경 필요
@@ -72,10 +72,10 @@ if __name__ == "__main__":
         print(f"이탈 시간 : {exit_time}")
         txt = "결제시도가 없었습니다."
         raise Exception(txt)
-        # kakao_alert(time=datetime.datetime.now(), txt=txt")
+        # kakao_alert(time=exit_time, txt=txt")
 
     # 물건 갯수 판단 Logic
-    obj_cnt = kiosk_views.소지한물건갯수_메소드  # 소지하고 있는 물건의 갯수
+    obj_cnt = kiosk_views.소지한물건갯수_메소드  # 소지하고 있는 물건의 갯수 / 라벨별 카운팅/ (라밸, 숫자)
     obj_cnt_fromDB = kiosk_views.바코드물건갯수_메소드  # 바코드에 찍힌 물건의 갯수
     if alertlogic.count_object_from_DB(obj_cnt, obj_cnt) != True:
         exit_time = datetime.now()
