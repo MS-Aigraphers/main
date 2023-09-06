@@ -64,6 +64,7 @@ def count_object_from_DB(obj_cnt:int, obj_cnt_fromDB:int) -> bool:
 # 예외적인 부분은 어떤것들이 있을까?
 
 def kakao_alert(time, txt) :
+    print(f'{time} {txt}')
     # 0831 작업 중
     # 백단에서 승훈 카톡api랑 연결중 0901 백단에서 코드 수정 중
     pass

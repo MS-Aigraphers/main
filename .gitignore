@@ -52,8 +52,10 @@
 # 학습파일
 *.pt
 
-# json
-*.json
+# json  0906 프론트작업을 위해 품
+# *.json
+kakao_code.json
+secrets.json
 
 
 # 중요내용
