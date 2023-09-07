@@ -59,5 +59,11 @@ secrets.json
 
 
 # 중요내용
-secret.txt
+secrets.txt
 *.txt
+
+kakao_key_copy.txt
+
+# pycache
+*.pyc
+__pycache__
