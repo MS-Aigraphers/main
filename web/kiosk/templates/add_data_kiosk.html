@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block contents %}
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <h1>kiosk DB 추가하기</h1>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                {{ error }}
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <form method="POST" action=".">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="store_name" class="form-label">지점 이름</label>
+                        <input type="text" class="form-control" id="store_name" placeholder="지점 이름" name="store_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="product_label" class="form-label">상품 종류</label>
+                        <select class="form-select" id="product_label" name="product_label">
+                            <option value="1">아이스크림</option>
+                            <option value="2">스낵</option>
+                            <option value="3">음료</option>
+                            <option value="4">라면</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="objectcount" class="form-label">상품 갯수</label>
+                        <input type="number" class="form-control" id="objectcount" placeholder="상품 갯수" name="objectcount">
+                    </div>
+                    <button type="submit" class="btn btn-primary">등록</button>
+                </form>
+            </div>
+        </div>
+        {% endblock %}

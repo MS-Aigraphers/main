@@ -1,29 +1,41 @@
 from django.db import models
-from django.utils import timezone
 
-# Create your models here.
+
+# class Kiosk(models.Model):
+#     store_name=models.CharField(max_length=200)
+#     #product_label=
+#     objectcount = models.IntegerField(default=0)  # 사물 개수 필드
+#     time = models.DateTimeField(auto_now_add=True)  # 시간 필드
+
+#     def __str__(self) :
+#         return self.store_name
+#     class Meta:
+#         db_table='Kiosk'
+#         verbose_name='Kiosk'   
+
+# label : 갯수 : 시간
+
+# 감지 / models.py : 1. 놈+놈+놈 == > 도난 감지
+# 안전 관리 / models.py : 1. 무기 2. 화재  3. 소음
+# 방문자 수 (cross line out 으로)
+
+# kiosk/models.py
+
 class Kiosk(models.Model):
-    id=models.AutoField(primary_key=True, unique=True)
-    store_id=models.IntegerField(models.ForeignKey("app.Model", on_delete=models.CASCADE))
-    name = models.CharField(max_length = 32, verbose_name="상품명")
-    price = models.IntegerField(verbose_name = "상품가격")
-    stock = models.IntegerField(verbose_name="수량")
-    registered_date = models.DateTimeField(verbose_name="등록시간", auto_now_add=timezone.now)
+    CATEGORY_CHOICES = (
+        (1, '아이스크림'),
+        (2, '스낵'),
+        (3, '음료'),
+        (4, '라면'),
+    )
 
-    # def get_name(self):
-    #     return {'person_id': self.name,'price':self.price,'stock':self.stock}
+    store_name = models.CharField(max_length=200)
+    product_label = models.IntegerField(choices=CATEGORY_CHOICES)
+    objectcount = models.IntegerField(default=0)
+    time = models.DateTimeField(auto_now_add=True)
 
-    # def get_date(self):
-    #     return self.registered_date
-
-    # def __str__(self):
-    #     return self.name
-    
-
+    def __str__(self):
+        return self.store_name
     class Meta:
-        db_table = "kiosk"
-        verbose_name = "상품"
-        verbose_name_plural = "상품"
-
-
-
+        db_table='Kiosk'
+        verbose_name='Kiosk'  
