@@ -1,8 +1,8 @@
 from django.urls import path
-from . import views
+from .views import add_data,try_payment
 
 
 urlpatterns = [
-   path('', views.index, name='index'),
-    path('get_kiosk_data/', views.get_kiosk_data, name='get_kiosk_data'),
+    path('add_data/', add_data, name='add_data'),
+    path('try_payment/', try_payment, name='try_payment'),
 ]

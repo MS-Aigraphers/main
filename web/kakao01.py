@@ -4,25 +4,22 @@ import time
 
 def access_keys(file_path):
     keys = {}
-
     with open(file_path, 'r') as file:
         lines = file.readlines()
-
         for line in lines:
             line = line.strip()  # 빈 칸과 개행 문자 제거
-
             if line and '=' in line:  # 빈 줄이 아니고, '=' 기호가 있는 경우에만 처리
                 key, value = line.split('=')
                 keys[value] = key.strip("'")
-
     return keys
 
 #code url  https://kauth.kakao.com/oauth/authorize?client_id=자신의 rest key값&redirect_uri=https://example.com/oauth&response_type=code
+#          https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code&scope=talk_message,friends
+
 url = 'https://kauth.kakao.com/oauth/token'
 FILE_PATH = "./kaokao_key_copy.txt"
 rest_api_key, authorize_code = access_keys(FILE_PATH)  # rest_api
 redirect_uri = 'https://example.com/oauth'
-
 
 ### Refresh token 발췌
 def f_auth():
@@ -36,16 +33,16 @@ def f_auth():
     response = requests.post(url, data=data)
     tokens = response.json()
 
-    with open("kakao_code.json", "w") as fp:
+    with open("kakao_code01.json", "w") as fp:
         json.dump(tokens, fp)
-    with open("kakao_code.json", "r") as fp:
+    with open("kakao_code01.json", "r") as fp:
         ts = json.load(fp)
     r_token = ts["refresh_token"]
     return r_token
 
 ### Refresh toekn 을 갖고 new Access token 발행
 def f_auth_refresh(r_token):
-    with open("kakao_code.json", "r") as fp:
+    with open("kakao_code01.json", "r") as fp:
         ts = json.load(fp)
     data = {
         "grant_type": "refresh_token",
@@ -55,9 +52,9 @@ def f_auth_refresh(r_token):
     response = requests.post(url, data=data)
     tokens = response.json()
 
-    with open(r"kakao_code.json", "w") as fp:
+    with open(r"kakao_code01.json", "w") as fp:
         json.dump(tokens, fp)
-    with open("kakao_code.json", "r") as fp:
+    with open("kakao_code01.json", "r") as fp:
         ts = json.load(fp)
     token = ts["access_token"]
     return token
@@ -79,10 +76,16 @@ def f_send_talk(token, text):
 
 r_token = f_auth()
 
+# def print_sound(indata, outdata, frames, time, status):
+#     volume_norm = np.linalg.norm(indata)*10
+#     # print (int(volume_norm))
+#     if (int(volume_norm)) > 80:
+
+
 while True:
     token = f_auth_refresh(r_token)
-    f_send_talk (token, '소음이 감지 되었습니다. www.naver.com')
-    time.sleep(1800)
+    f_send_talk (token, '소음이 감지 되었습니다. \n www.naver.com')
+    time.sleep(180)
 
 
 

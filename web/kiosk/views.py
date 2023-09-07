@@ -1,69 +1,48 @@
 import json
-from django.http import JsonResponse
 from django.core.serializers import serialize
 from .models import Kiosk
 from django.shortcuts import render,redirect
 from django.utils import timezone
-
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse,JsonResponse
+# payment_time_fromDB = kiosk.views.결제시도_메소드  # 결제시도 시각 TODO : 데이터 변경 필요
+# obj_cnt_fromDB = kiosk.views.바코드물건갯수_메소드  # 바코드에 찍힌 물건의 갯수
 
 
 # 데이터를 추가하는 뷰 함수
-def index(request):
-    new_data = Kiosk(time=timezone.now(), objectcount=1) # objectcount
-    new_data.save()
-    return render(request, 'kiosk/add_kiosk_data.html')
+def add_data(request):
+    if request.method=='GET':
+        return render(request,'add_data_kiosk.html')
+    elif request.method=='POST':
+        store_name=request.POST.get('store_name',None)
+        objectcount = request.POST.get('objectcount',None)  # 사물 개수 필드
+        product_label = request.POST.get('product_label', None)  # 상품 종류 필드
+
+        err_data={}
+        if not(store_name and objectcount):
+            err_data['error']='모든 값을 입력해주세요.'
+        else:
+            kiosk=Kiosk(
+                store_name=store_name,
+                product_label=product_label,
+                objectcount=objectcount,
+                time=timezone.now()
+            )
+            kiosk.save()
+        return render(request,'add_data_kiosk.html',err_data)
 
 
-# Kiosk 테이블의 데이터를 JSON 형태로 반환하는 뷰 함수
-def get_kiosk_data(request):
-    kiosk_data = Kiosk.objects.all()
-    data_list = [{'time': data.time.strftime('%Y-%m-%d %H:%M:%S'), 'objectcount': data.objectcount} for data in kiosk_data]
-    kiosk_data_json=JsonResponse(data_list, safe=False)
-    return kiosk_data_json
+def try_payment(request):
+    # Kiosk 모델에서 결제시도 시각 정보를 가져옵니다.
+    item_counts = Kiosk.objects.values_list('objectcount', flat=True)  # 갯수 정보만 가져옴
+    payment_times = Kiosk.objects.values_list('time', flat=True)  # 시각 정보만 가져옴
+
+    # 결과를 화면에 출력하거나 다른 처리를 수행할 수 있습니다.
+    for payment_time in payment_times:
+        print(payment_time)
+    for item_count in item_counts:
+        print(item_count)
+    # 데이터를 템플릿에 전달하여 렌더링합니다.
+    return render(request, 'show_data.html', {'payment_times': payment_times,'item_counts': item_counts})
 
 
-
-
-
-
-# def data_added(request):
-#     if request.method == 'POST':
-#         # POST 요청을 받았을 때 처리하는 로직
-#         time = timezone.now()  # 현재 시간
-#         objectcount = request.POST.get('objectcount', 0)  # POST 데이터에서 objectcount 값을 가져옴
-#         Kiosk.objects.create(time=time, objectcount=objectcount)  # Kiosk 테이블에 데이터 추가
-#         return redirect('data_added')  # 데이터 추가 후 다시 data_added 페이지로 리다이렉트
-
-#     kiosk_data = Kiosk.objects.all()  # Kiosk 테이블의 모든 데이터를 가져옴
-#     context = {'kiosk_data': kiosk_data}
-#     return render(request, 'kiosk/data_added.html', context)
-
-# # 추가된 데이터 확인을 위한 뷰 함수
-# def data_added(request):
-#     return render(request, 'kiosk/add_kiosk_data.html')
-
-# def add_kiosk_data(time, objectcount):
-#     kiosk_data = Kiosk(time=time, objectcount=objectcount)
-#     kiosk_data.save()
-
-# def index(request):
-#     if request.method == 'POST' and 'a' in request.POST:
-#         current_time = datetime.now()
-#         object_count = 5  # 예시로 설정한 사물 개수
-#         add_kiosk_data(current_time, object_count)  # 데이터 추가
-
-#     return render(request, 'add_kiosk_data.html')
-    
-# def data_added(request):
-#     return render(request, 'kiosk/add_kiosk_data.html')
-
-# def save_kiosk_data_to_json(request):
-#     kiosk_data = Kiosk.objects.all()  # Kiosk 테이블의 데이터 가져오기
-
-#     # 데이터를 직렬화하여 JSON 파일로 저장
-#     data = serialize('json', kiosk_data)
-#     data_file_path = 'kiosk_data.json'
-#     with open(data_file_path, 'w') as json_file:
-#         json_file.write(data)
-    
-#     return JsonResponse({'message': 'Kiosk data saved to JSON file.'})
