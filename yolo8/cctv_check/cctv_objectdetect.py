@@ -7,12 +7,8 @@ from kiosk import kioskzoneenter
 from kiosk import countobject
 from collections import Counter
 import datetime
-kioskenter = None
-current_time = 0
 
-def cctv_objectdetect(callback_func1,callback_func2) :
-
-    global kioskenter , current_time
+def cctv_objectdetect(result_queue,count_queue):
 
     ########################## <영상 추출 부분> #################################
 
@@ -40,7 +36,7 @@ def cctv_objectdetect(callback_func1,callback_func2) :
     count_coords = [(800, 300), (1300, 300), (1300, 800), (800, 800)]  # 카운팅 용 박스
 
     start_time = None
-    paying_threshold = 5 # 계산 시간 설정부분
+    paying_threshold = 5  # 계산 시간 설정부분
 
     object_detected = False
     paying = 0
@@ -49,9 +45,7 @@ def cctv_objectdetect(callback_func1,callback_func2) :
     object_keys = []
     object_values = []
     object_types = []
-    capturing_time = 0
     entertime = 0
-
 
     ########################################################################################
 
@@ -62,8 +56,9 @@ def cctv_objectdetect(callback_func1,callback_func2) :
         if not ret:
             break
 
-        object_counts_list = [] # 객체 카운팅 리스트
-        object_counts_frame = {} # 프레임 당 카운팅 정보 저장 리스트
+        object_counts_list = []  # 객체 카운팅 리스트
+        object_counts_frame = {}  # 프레임 당 카운팅 정보 저장 리스트
+        current_time = 0
 
         ###################### 모델 설정 부분 ##############################
 
@@ -110,27 +105,19 @@ def cctv_objectdetect(callback_func1,callback_func2) :
                 cv2.putText(frame, iou_text, (width - 200, 40), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
                 # 사람일 경우 미리 설정된 kiosk_bbox 와의 iou 계산 및 출력 프레임에 표시
 
-                result,paying = kioskzoneenter(frame, iou, fps, width, paying_threshold,iou_threshold)
-                if result :
-                    cv2.putText(frame,"Okay",(width - 400, 120),cv2.FONT_HERSHEY_PLAIN,2,(0, 0, 255),2)
-                    kioskenter = result
+                result, paying = kioskzoneenter(frame, iou, fps, width, paying_threshold, iou_threshold)
+                if result:
+                    cv2.putText(frame, "Okay", (width - 400, 120), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
+                result_queue.put((iou,result,paying))
                     # kioskzoneenter 의 result 결괏값이 true 인 경우 (paying 시간이 설정 시간보다 큰 경우) 프레임에 표시
-                else :
-                    kioskenter = result
-                callback_func1(kioskenter)
 
             if paying > paying_threshold:
-                if entertime == 0 :
-                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    callback_func2(current_time)
-                    entertime += 1
-
                 object_detected = countobject(x, y, count_coords, class_name, object_counts_frame, object_detected)
 
                 # paying 시간이 설정 시간보다 큰 경우 객체의 숫자를 카운팅 하는 부분
 
             cv2.rectangle(frame, (x, y), (x2, y2), (0, 0, 225), 2)
-            cv2.putText(frame,f'{class_name} ({confidence:.2f})',(x, y - 5),cv2.FONT_HERSHEY_PLAIN,2,(0, 0, 225),2,)
+            cv2.putText(frame, f'{class_name} ({confidence:.2f})', (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 225), 2, )
             # 객체 인식 결과 (객체 종류 , confidence 값) 을 bbox 와 함께 frame 에 표시하는 부분
 
             ##############################################################################################################
@@ -150,28 +137,19 @@ def cctv_objectdetect(callback_func1,callback_func2) :
             for i in range(len(object_keys)):
                 key = object_keys[i]
                 value = object_values[i]
-            object_types.append([key,value])
+            object_types.append([key, value])
 
-            #print(object_types) # ex (drink,3)
+            # print(object_types) # ex (drink,3)
 
         ############################# 객체 카운팅 이후 갯수 판단 로직 부분 #################################
-        if recent_paying == paying_threshold :
-            if capturing_time == 0 :
-                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-                image_filename = f"frame_{timestamp}.jpg"
-
-                # 현재 프레임을 이미지로 저장
-                cv2.imwrite(image_filename, frame)
-                capturing_time +=1
 
         if iou == 0 and recent_paying > paying_threshold and paying == 0:
             # 값을 추출
             values = [item[1] for item in object_types]
-            capturing_time = 0
-            entertime = 0
+
+
             # Counter를 사용하여 각 값의 발생 횟수를 계산
             value_counts = Counter(values)
-
             # 백분율 계산
             total_values = len(values)
             percentage_counts = {value: count / total_values * 100 for value, count in value_counts.items()}
@@ -180,13 +158,13 @@ def cctv_objectdetect(callback_func1,callback_func2) :
 
             ############################# 갯수 판단 이후 txt 로 저장하는 부분 #################################
             for value, count in value_counts.items():
-                #print(f"{value} 값은 {count}번 발생하며, 전체 중 {percentage_counts[value]:.2f}%를 차지합니다.")
-                if value == max(values) :
+                # print(f"{value} 값은 {count}번 발생하며, 전체 중 {percentage_counts[value]:.2f}%를 차지합니다.")
+                if value == max(values):
 
                     ###################### txt 이름에 현재시간 추가 ##########################################
 
-                    # timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-                    # filename = f"output_{timestamp}.txt"  # 파일 이름에 타임스탬프를 사용합니다.
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                    filename = f"output_{timestamp}.txt"  # 파일 이름에 타임스탬프를 사용합니다.
 
                     ####################################################################################
 
@@ -205,8 +183,7 @@ def cctv_objectdetect(callback_func1,callback_func2) :
 
                     for class_name in percentage_counts.keys():
                         class_name_int = int(class_name)
-                        if class_name_int > max_percentage_object_class_int and percentage_counts[
-                            class_name] >= threshold_percentage:
+                        if class_name_int > max_percentage_object_class_int and percentage_counts[class_name] >= threshold_percentage:
                             if percentage_counts[class_name] > max_above_threshold_percentage:
                                 max_above_threshold_class = class_name_int
                                 max_above_threshold_percentage = percentage_counts[class_name]
@@ -215,9 +192,12 @@ def cctv_objectdetect(callback_func1,callback_func2) :
                     if max_above_threshold_class is None:
                         max_above_threshold_class = max_percentage_object_class_int
 
+                    count_queue.put((object_types[0][0],max_above_threshold_class))
+
                     # 파일에 기록
                     with open(filename, "a") as text_file:
-                        text_file.write(f'\n{object_types[0][0]},{max_above_threshold_class},{max_above_threshold_percentage}')
+                        text_file.write(
+                            f'\n{object_types[0][0]},{max_above_threshold_class},{max_above_threshold_percentage}')
 
                     # # 프레임을 이미지로 저장
                     # image_filename = f"frame_{timestamp}.jpg"
@@ -230,7 +210,7 @@ def cctv_objectdetect(callback_func1,callback_func2) :
 
             ################################################################################################
 
-        if iou > iou_threshold :
+        if iou > iou_threshold:
             recent_paying = paying
         cv2.imshow('Frame', frame)
         output.write(frame)
@@ -239,7 +219,6 @@ def cctv_objectdetect(callback_func1,callback_func2) :
         if key == 27:
             output.write(frame)
             break
-
 
     cap.release()
     output.release()
