@@ -1,2 +1,0 @@
-rest_api_key=d9a83dca23c7a4642db4f78a0bf04d50
-authorize_code=QC2hX53tVPAhLB4ZVCTmMlFKuzdi5B5CNJxSCzYBDLM2SQLCr1rPF1h-VaUMftoFB60qMAopyV8AAAGKbdvzgA

@@ -100,7 +100,7 @@ class SoundMonitor(threading.Thread):
             sd.sleep(self.duration * 1000)
 
 if __name__ == "__main__":
-    file_path = "./kaokao_key_copy.txt"
+    file_path = "./kakao_key_copy.txt"
     redirect_uri = 'https://example.com/oauth'
     message = '소음이 감지 되었습니다. \n www.naver.com'
     
