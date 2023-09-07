@@ -1,92 +1,102 @@
-import cv2
-from ultralytics import YOLO
-import numpy as np
-import os
-import find_weapon
+import threading
+import queue
+import datetime
+from cctv_objectdetect import cctv_objectdetect
 
-count = 0
-cap = cv2.VideoCapture("./cctv_videodata/weapon_Sequence.mp4")  # 여기 영상 경로를 넣어주세요
-#model_face = YOLO('./yolov8n-face.pt')
-model_detect = YOLO('./08291455.pt') # 사용할 모델.pt 를 넣어주세요
-#model_detect = YOLO('yolov8s.pt')
+result = None
+paying = 0
+recent_paying = 0
+paying_threshold = 5
+iou_threshold = 0.4
+payment_event = threading.Event()
+# 결과를 result 큐에서 수집하는 함수
+def collect_results(result_queue):
+    # 키오스크 박스에서 일정 시간 이상 머무름 -> 계산했다고 판단 -> 시작시간,끝시간 체크
+    # -> db 상의 시간과 대소비교, -> 범위 내에 없을 시, 혹은 데이터 없을 시 도난 의심
+    # -> 범위 내에 있을 시 결제 판단 -> 카운팅 로직(countobject) 로 넘겨서 확인
+    global result , payment
+    start_time = None
+    end_time = None
+    #payment = None
 
-find_weapon.show_weapons() # weapon_list를 생성하는 함수
+    ###################################### 시간 감지 부분 #########################################
+    while True:
+        try:
+            iou,result,paying = result_queue.get()
+            if result :
 
+                if start_time is None :
+                    start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    #print('start_time',start_time)
 
-# 동영상 저장을 위한 VideoWriter 객체 생성
-fps = cap.get(cv2.CAP_PROP_FPS)  # 원본 동영상의 프레임 속도
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 원본 동영상의 프레임 너비
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 원본 동영상의 프레임 높이
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 동영상 코덱 설정
-output = cv2.VideoWriter("output2.mp4", fourcc, fps, (width, height))  # 출력 동영상 파일 설정, 이름도 변경 가능
-#print(fps,width,height,fourcc,output)
-
-
-class_names = []
-with open("./classes.txt", "r") as f:
-    lines = f.readlines()
-    for line in lines:
-        class_names.append(line.strip())   # class_names 리스트에 classes.txt 파일을 불러와서 저장시킴
-#print(class_names)
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    # results_face = model_face(frame)
-    # result_face = results_face[0]
-    # bboxes_face = np.array(result_face.boxes.xyxy.cpu(), dtype="int")
-    # classes_face = np.array(result_face.boxes.cls.cpu(), dtype="int")
-
-    results_detect = model_detect(frame)
-    result_detect = results_detect[0]
-    bboxes_detect = np.array(result_detect.boxes.xyxy.cpu(), dtype="int")
-    classes_detect = np.array(result_detect.boxes.cls.cpu(), dtype="int")
-
-    # for i, (cls, bbox) in enumerate(zip(classes_face, bboxes_face)):
-    #     (x, y, x2, y2) = bbox
-    #     class_name = class_names[cls]
-        
-    #     # 얼굴 영역 추출
-    #     face_region = frame[y:y2, x:x2]
-
-    #     # 얼굴 영역을 blur 처리
-    #     blurred_face = cv2.GaussianBlur(face_region, (21, 21), 0)
-
-    #     # blur 처리된 영역을 다시 원본 이미지에 적용
-    #     frame[y:y2, x:x2] = blurred_face
-
-    #     cv2.rectangle(frame, (x, y), (x2, y2), (0, 255, 0), 2)  # 얼굴 바운딩 박스의 색상을 변경합니다.
-    #     cv2.putText(frame, class_name, (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
-        
-    for i, (cls, bbox) in enumerate(zip(classes_detect, bboxes_detect)):
-        (x, y, x2, y2) = bbox
-        class_name = class_names[cls]
-        confidence = result_detect.boxes.conf[i]
-        if class_name == 'Weapon' :
-            if confidence < 0.3 :
-                continue
-        else :
-            if confidence <0.5 :
-                continue
-        cv2.rectangle(frame, (x, y), (x2, y2), (0, 0, 225), 2)
-        cv2.putText(frame, f'{class_name} ({confidence:.2f})', (x, y - 5), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 225), 2)
-        
-        find_weapon.is_weapon(class_name, frame)
-        
-        # 무기 소지 시의 프레임을 이미지로 저장
-    find_weapon.save_weapon('./weapon/')
-
-    cv2.imshow('Frame', frame)
-    output.write(frame)
-
-    key = cv2.waitKey(1)
-    if key == 27:
-        output.write(frame)
-        break
+            else :
+                print( iou,result,paying)
 
 
-cap.release()
-output.release()  # 출력 동영상 파일 닫기
-cv2.destroyAllWindows()
+            if iou == 0 and recent_paying > paying_threshold and paying == 0:
+                if end_time is None:
+                    end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    #print('end', end_time)
+
+            if iou > iou_threshold:
+                recent_paying = paying
+    ######################################################################################
+            ##################### 도난 여부 판단 부분 #########################
+            if start_time is not None and end_time is not None :
+                print(start_time,end_time)
+                db_time = '2023-09-06 06:24:30' # db에서 받아올 데이터
+                if start_time < db_time < end_time :
+                    print('payment_completed')
+                    payment = True
+                    print(payment)
+                    payment_event.set()
+                else :
+                    print('도난 의심상황 발생')
+                start_time = None
+                end_time = None
+
+        except queue.Empty:
+            print("새로운 결과가 아직 없습니다...")
+        #time.sleep(1)  # 무한 루프를 피하기 위해 잠시 대기
+
+# current_time을 current_time 큐에서 수집하는 함수
+def objectcount(count_queue):
+    while True:
+        try:
+            object_name , number = count_queue.get()
+            payment_event.wait()
+            global payment
+            if payment:
+                if object_name == # db 물건종류 데이터 :
+                    if number <= # db 물건갯수 데이터 :
+                        print(object_name, number) # db 와 물건 종류, 갯수를 비교할 db 데이터를 불러올 곳
+                        print('정상 결제되었습니다')
+                    else :
+                        print('도난')
+                else :
+                    print('도난')
+        except queue.Empty:
+            print("아직 새로운 현재 시간이 없습니다...")
+        #time.sleep(1)  # 무한 루프를 피하기 위해 잠시 대기
+
+# 결과를 생성하고 result 변수를 업데이트하는 함수
+
+
+if __name__ == "__main__":
+    result_queue = queue.Queue()
+    count_queue = queue.Queue()
+
+    detect_thread = threading.Thread(target=cctv_objectdetect, args=(result_queue, count_queue))
+    collect_result_thread = threading.Thread(target=collect_results, args=(result_queue,))
+    count_thread = threading.Thread(target=objectcount, args=(count_queue,))
+
+
+    detect_thread.start()
+    collect_result_thread.start()
+    count_thread.start()
+
+    detect_thread.join()
+    collect_result_thread.join()
+    count_thread.join()
+
+
