@@ -250,9 +250,9 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
                     count_queue.put((object_types[0][0],max_above_threshold_class))
 
                     # 파일에 기록
-                    with open(filename, "a") as text_file:
-                        text_file.write(
-                            f'\n{object_types[0][0]},{max_above_threshold_class},{max_above_threshold_percentage}')
+                    # with open(filename, "a") as text_file:
+                    #     text_file.write(
+                    #         f'\n{object_types[0][0]},{max_above_threshold_class},{max_above_threshold_percentage}')
 
                     # # 프레임을 이미지로 저장
                     # image_filename = f"frame_{timestamp}.jpg"
