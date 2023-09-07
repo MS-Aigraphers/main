@@ -46,3 +46,16 @@ def try_payment(request):
     return render(request, 'show_data.html', {'payment_times': payment_times,'item_counts': item_counts})
 
 
+
+def get_object_data():
+    try:
+        # 데이터베이스에서 원하는 물건 종류와 갯수를 가져옵니다.
+        kiosk_data = Kiosk.objects.get(store_name='가게 이름')  # 가게 이름에 따라 필터링
+        object_name = kiosk_data.product_label()  # 물건 종류 표시
+        object_count = kiosk_data.objectcount  # 물건 갯수
+        time=kiosk_data.time(timezone.now())
+        return object_name, object_count,time
+    except Kiosk.DoesNotExist:
+        return None, None
+
+
