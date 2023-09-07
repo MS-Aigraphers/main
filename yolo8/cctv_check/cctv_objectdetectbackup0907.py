@@ -6,11 +6,9 @@ from calculate_iou import calculate_iou
 from kiosk import kioskzoneenter
 from kiosk import countobject
 from collections import Counter
-from distance_check import check_distance_between_objects
-
 import datetime
 
-def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
+def cctv_objectdetect(result_queue,count_queue):
 
     ########################## <영상 추출 부분> #################################
 
@@ -36,10 +34,6 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
     kiosk_bbox = (
         kiosk_coords[0][0], kiosk_coords[0][1], kiosk_coords[2][0], kiosk_coords[2][1])  # IOU 계산을 위해 변환 (X,Y,X2,Y2 형태)
     count_coords = [(800, 300), (1300, 300), (1300, 800), (800, 800)]  # 카운팅 용 박스
-    # 가로로 놓인 라인 좌표 정의
-    line = [(600, 250), (1200, 250)]  # 라인 좌표를 정의하세요
-
-
 
     start_time = None
     paying_threshold = 5  # 계산 시간 설정부분
@@ -51,12 +45,7 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
     object_keys = []
     object_values = []
     object_types = []
-    distance = False
-    min_distance = 150
-    # 변수 초기화
-    previous_center_y = None  # 이전 프레임의 상태를 저장하는 변수
-    human_inside = False  # 라인을 통과한 Human 수를 추적하는 변수
-
+    entertime = 0
 
     ########################################################################################
 
@@ -79,11 +68,6 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
         classes_detect = np.array(result_detect.boxes.cls.cpu(), dtype="int")
 
         ##################################################################
-        # # 가로 라인을 프레임에 그립니다.
-        # cv2.line(frame, line[0], line[1], (0, 0, 255), 2)  # 빨간색으로 라인을 그립니다.
-
-        # Human 객체의 bbox 중심 위치 추적 및 라인 통과 여부 확인
-        current_status = "None"  # 현재 프레임의 상태를 저장하는 변수
 
         ########################### 객체 탐지 및 키오스크 존 관련 루프 ####################
 
@@ -116,46 +100,10 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
 
             if class_name == "0 : Human":
                 person_bbox = (x, y, x2, y2)
-
-                # bbox 중심 좌표 계산
-                center_x = (x + x2) // 2
-                center_y = (y + y2) // 2
-
-                # 이전 프레임에서 중심 y 좌표가 없는 경우 현재 좌표로 초기화
-                if previous_center_y is None:
-                    previous_center_y = center_y
-
-                # 중심이 라인을 위에서 아래로 통과한 경우
-                if previous_center_y < line[0][1] and center_y >= line[0][1]:
-                    human_inside = True
-                # 중심이 라인을 아래에서 위로 통과한 경우
-                elif previous_center_y >= line[0][1] and center_y < line[0][1] and human_inside == True :
-                    human_inside = False
-
-                cross_queue.put(human_inside)
-                # 이전 중심 y 좌표를 현재 값으로 업데이트
-                previous_center_y = center_y
-
-
                 iou = calculate_iou(kiosk_bbox, person_bbox)
                 iou_text = f'IOU: {iou:.2f}'
                 cv2.putText(frame, iou_text, (width - 200, 40), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
                 # 사람일 경우 미리 설정된 kiosk_bbox 와의 iou 계산 및 출력 프레임에 표시
-
-                # 다른 객체와의 거리 계산
-                if distance is False :
-                    if iou <iou_threshold :
-                        for j in range(len(bboxes_detect)):
-
-                            if i != j:  # 같은 객체와의 거리는 계산하지 않음
-                                other_bbox = bboxes_detect[j]
-                                distance = check_distance_between_objects(person_bbox, other_bbox,min_distance)
-
-                                if distance is True:
-                                    break
-                object_queue.put(distance)
-
-
 
                 result, paying = kioskzoneenter(frame, iou, fps, width, paying_threshold, iou_threshold)
                 if result:
@@ -163,11 +111,8 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
                 result_queue.put((iou,result,paying))
                     # kioskzoneenter 의 result 결괏값이 true 인 경우 (paying 시간이 설정 시간보다 큰 경우) 프레임에 표시
 
-
-
             if paying > paying_threshold:
                 object_detected = countobject(x, y, count_coords, class_name, object_counts_frame, object_detected)
-                distance = False
 
                 # paying 시간이 설정 시간보다 큰 경우 객체의 숫자를 카운팅 하는 부분
 
@@ -218,8 +163,8 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
 
                     ###################### txt 이름에 현재시간 추가 ##########################################
 
-                    # timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-                    # filename = f"output_{timestamp}.txt"  # 파일 이름에 타임스탬프를 사용합니다.
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                    filename = f"output_{timestamp}.txt"  # 파일 이름에 타임스탬프를 사용합니다.
 
                     ####################################################################################
 

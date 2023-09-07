@@ -3,100 +3,162 @@ import queue
 import datetime
 from cctv_objectdetect import cctv_objectdetect
 
-result = None
-paying = 0
-recent_paying = 0
-paying_threshold = 5
-iou_threshold = 0.4
+# 변수를 저장하기 위한 전역 사전 생성
+global_vars = {
+    "result": None,
+    "payment": None,
+    "paying": 0,
+    "recent_paying": 0,
+    "paying_threshold": 5,
+    "iou_threshold": 0.4,
+    'distance': None,
+    'human_inside' : False,
+    'start_time' : None,
+    'end_time' : None,
+    'prev_inside' : False,
+    'countobject' : False,
+}
 payment_event = threading.Event()
-# 결과를 result 큐에서 수집하는 함수
-def collect_results(result_queue):
-    # 키오스크 박스에서 일정 시간 이상 머무름 -> 계산했다고 판단 -> 시작시간,끝시간 체크
-    # -> db 상의 시간과 대소비교, -> 범위 내에 없을 시, 혹은 데이터 없을 시 도난 의심
-    # -> 범위 내에 있을 시 결제 판단 -> 카운팅 로직(countobject) 로 넘겨서 확인
-    global result , payment
-    start_time = None
-    end_time = None
-    #payment = None
+cross_event = threading.Event()
+move_event = threading.Event()
+collect_event = threading.Event()
 
-    ###################################### 시간 감지 부분 #########################################
+
+def check_crossing_line(cross_queue):
     while True:
         try:
-            iou,result,paying = result_queue.get()
-            if result :
 
-                if start_time is None :
-                    start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    #print('start_time',start_time)
-
-            else :
-                print( iou,result,paying)
+            global_vars['human_inside'] = cross_queue.get()
 
 
-            if iou == 0 and recent_paying > paying_threshold and paying == 0:
-                if end_time is None:
-                    end_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    #print('end', end_time)
+            if global_vars['human_inside'] :
 
-            if iou > iou_threshold:
-                recent_paying = paying
-    ######################################################################################
-            ##################### 도난 여부 판단 부분 #########################
-            if start_time is not None and end_time is not None :
-                print(start_time,end_time)
-                db_time = '2023-09-06 06:24:30' # db에서 받아올 데이터
-                if start_time < db_time < end_time :
-                    print('payment_completed')
-                    payment = True
-                    print(payment)
-                    payment_event.set()
-                else :
-                    print('도난 의심상황 발생')
-                start_time = None
-                end_time = None
+                cross_event.set()
+            elif global_vars['human_inside'] is False :
+                global_vars['distance'] = None
+
+        except:
+            print("새로운 결과가 아직 없습니다...")
+
+
+def ObjectMoveCheck(object_queue):
+    while True:
+        try:
+            cross_event.wait()
+            print(global_vars['payment'],'payment')
+
+            global_vars['distance'] = object_queue.get()
+            if global_vars['distance']:
+                global_vars['payment'] = False
+
+
+
+
+                move_event.set()
+
+
+            # elif global_vars['distance'] is False :
+
 
         except queue.Empty:
             print("새로운 결과가 아직 없습니다...")
-        #time.sleep(1)  # 무한 루프를 피하기 위해 잠시 대기
 
-# current_time을 current_time 큐에서 수집하는 함수
+
+def collect_results(result_queue):
+    while True:
+        try:
+            iou, result, paying = result_queue.get()
+            move_event.wait()
+
+            print(iou, result, paying)
+            if result:
+                if global_vars["start_time"] is None:
+                    global_vars["start_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    #print(global_vars["start_time"],'start')
+
+
+            print(global_vars['human_inside'], 'human')
+            print(global_vars['prev_inside'], 'prev')
+            if global_vars['prev_inside'] is True and global_vars['human_inside'] is False :
+                global_vars["end_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
+            if global_vars["start_time"] is not None and global_vars["end_time"] is not None:
+                print(global_vars["start_time"], global_vars["end_time"])
+
+                db_time = '2023-09-06 06:24:30'  # db에서 받아올 데이터
+                # if global_vars["start_time"] <db_time and db_time <global_vars["end_time"] :
+                print('payment_completed')
+                global_vars["payment"] = True
+                print(global_vars["payment"])
+                global_vars['countobject'] = True
+
+                global_vars["start_time"] = None
+                global_vars["end_time"] = None
+
+                payment_event.set()
+
+            if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars[
+                "payment"] is False:
+                print('도난')
+                global_vars["payment"] = None
+
+
+            global_vars['prev_inside'] = global_vars['human_inside']
+
+                    # if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars[
+                    #     "payment"] is False:
+                    #     print('도난')
+
+
+
+
+        except queue.Empty:
+            print("새로운 결과가 아직 없습니다...")
+
+
 def objectcount(count_queue):
     while True:
         try:
-            object_name , number = count_queue.get()
+            object_name, number = count_queue.get()
             payment_event.wait()
-            global payment
-            if payment:
-                if object_name == # db 물건종류 데이터 :
-                    if number <= # db 물건갯수 데이터 :
-                        print(object_name, number) # db 와 물건 종류, 갯수를 비교할 db 데이터를 불러올 곳
-                        print('정상 결제되었습니다')
-                    else :
-                        print('도난')
-                else :
-                    print('도난')
+            # print('갯수',global_vars["payment"])
+            if global_vars['countobject']:
+                print(object_name,number,'물건')
+                # if object_name == # db 물건종류 데이터 :
+                #     if number <= # db 물건갯수 데이터 :
+                #         print(object_name, number) # db 와 물건 종류, 갯수를 비교할 db 데이터를 불러올 곳
+                #         print('정상 결제되었습니다')
+                #     else :
+                #         print('도난')
+                # else :
+                #     print('도난')
+                global_vars['countobject'] = False
         except queue.Empty:
             print("아직 새로운 현재 시간이 없습니다...")
-        #time.sleep(1)  # 무한 루프를 피하기 위해 잠시 대기
-
-# 결과를 생성하고 result 변수를 업데이트하는 함수
 
 
 if __name__ == "__main__":
     result_queue = queue.Queue()
     count_queue = queue.Queue()
+    object_queue = queue.Queue()
+    cross_queue = queue.Queue()
 
-    detect_thread = threading.Thread(target=cctv_objectdetect, args=(result_queue, count_queue))
+    detect_thread = threading.Thread(target=cctv_objectdetect,
+                                     args=(result_queue, count_queue, object_queue, cross_queue))
     collect_result_thread = threading.Thread(target=collect_results, args=(result_queue,))
     count_thread = threading.Thread(target=objectcount, args=(count_queue,))
-
+    object_thread = threading.Thread(target=ObjectMoveCheck, args=(object_queue,))
+    cross_thread = threading.Thread(target=check_crossing_line, args=(cross_queue,))
 
     detect_thread.start()
     collect_result_thread.start()
     count_thread.start()
+    object_thread.start()
+    cross_thread.start()
 
     detect_thread.join()
     collect_result_thread.join()
     count_thread.join()
-
-
+    object_thread.join()
+    cross_thread.join()
