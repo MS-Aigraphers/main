@@ -17,6 +17,7 @@ global_vars = {
     'end_time' : None,
     'prev_inside' : False,
     'countobject' : False,
+
 }
 payment_event = threading.Event()
 cross_event = threading.Event()
@@ -54,6 +55,7 @@ def ObjectMoveCheck(object_queue):
                 move_event.set()
             elif global_vars['distance']:
                 move_event.set()
+                global_vars['payment'] = False
 
 
 
@@ -90,7 +92,7 @@ def collect_results(result_queue):
 
                 db_time = 130  # db에서 받아올 데이터
                 if global_vars["start_time"] <db_time and db_time <global_vars["end_time"] :
-                    print('payment_completed')
+                    print('결제 완료')
                     global_vars["payment"] = True
                     print(global_vars["payment"])
                     global_vars['countobject'] = True
@@ -99,14 +101,20 @@ def collect_results(result_queue):
                     global_vars["end_time"] = None
 
                     payment_event.set()
+
                 else :
                     print('계산하는 척 도난')
+
+                    # countup_계산한척##########################################
 
 
 
             if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars["payment"] is False:
                 if global_vars['distance'] :
-                    print('바로 도난 후 도망')
+                    print('도망')
+
+                    ## countup_튄놈###################################################
+
                     global_vars["payment"] = None
                 else :
                     global_vars["payment"] = None
@@ -134,7 +142,20 @@ def objectcount(count_queue):
             # print('갯수',global_vars["payment"])
             if global_vars['countobject']:
                 print(object_name,number,'물건')
-                # 물건 이름 , 갯수 db 추가 부분####################################################################
+
+                # 물건 이름 , 갯수 db 추가 부분##############################################
+                # if object_name == db 물건 이름 :
+                #     if number == db 물건 갯수 :
+                #         print('정상 결제')
+                #         # countup 물건 갯수
+                #
+                #     else :
+                #         # countup_개수안맞은놈#####################
+                #
+                # else :
+                #     # countup_개수안맞은놈######################
+                #########################################################################
+
 
 
                 global_vars['countobject'] = False
