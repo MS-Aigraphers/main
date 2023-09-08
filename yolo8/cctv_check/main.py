@@ -1,7 +1,7 @@
 import threading
 import queue
 import datetime
-from test08 import cctv_objectdetect
+from cctv_objectdetect import cctv_objectdetect
 
 # 변수를 저장하기 위한 전역 사전 생성
 global_vars = {
