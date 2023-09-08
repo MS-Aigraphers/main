@@ -1,0 +1,69 @@
+# PDF
+*.pdf
+
+# ZIP
+*.zip
+*.tar.gz
+*.gz
+*.ubyte
+*.tar
+
+
+# h5
+*.h5
+
+#ppt
+*.ppt
+*.pptx
+
+# 설치파일 
+*.dmg
+*.exe
+
+
+# 사진
+*.png
+*.jpg
+*.jpeg
+*.dng
+
+
+# 영상
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.webm
+
+#음악
+*.wav
+
+# 다운로드된 파일 이그놀
+*ubyte*
+*batches-py*
+*pth*
+
+# txt
+*.xml
+*.DS_Store*
+
+# 학습파일
+*.pt
+
+# json  0906 프론트작업을 위해 품
+# *.json
+kakao_code.json
+secrets.json
+
+
+# 중요내용
+secrets.txt
+*.txt
+
+kakao_key_copy.txt
+
+# pycache
+*.pyc
+__pycache__

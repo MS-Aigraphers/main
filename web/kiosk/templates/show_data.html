@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Display</title>
+</head>
+<body>
+    <h1>결제 시간 정보</h1>
+    <ul>
+        {% for payment_time in payment_times %}
+            <li>{{ payment_time }}</li>
+        {% endfor %}
+    </ul>
+
+    <h1>물건 갯수 정보</h1>
+    <ul>
+        {% for item_count in item_counts %}
+            <li>{{ item_count }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
