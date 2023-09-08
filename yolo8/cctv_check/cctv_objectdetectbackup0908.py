@@ -10,7 +10,7 @@ from distance_check import check_distance_between_objects
 
 import datetime
 
-def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_queue):
+def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue):
 
     ########################## <영상 추출 부분> #################################
 
@@ -45,7 +45,6 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
     paying_threshold = 5  # 계산 시간 설정부분
 
     object_detected = False
-    weapon_detected = False
     paying = 0
     recent_paying = 0
     iou_threshold = 0.4
@@ -54,7 +53,6 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
     object_types = []
     distance = False
     min_distance = 150
-    iou=0
     # 변수 초기화
     previous_center_y = None  # 이전 프레임의 상태를 저장하는 변수
     human_inside = False  # 라인을 통과한 Human 수를 추적하는 변수
@@ -109,11 +107,8 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
 
             if class_name == "6 : Weapon":
                 cv2.putText(
-                    frame, "Weapon!!!", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                weapon_detected = True
-                weapon_queue.put((frame,weapon_detected))
-
-                # Weapon 의 confidence 값이 0.7 이상일 경우 출력 프레임에 경고 표시,
+                    frame, "Weapon!!!", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2
+                )  # Weapon 의 confidence 값이 0.7 이상일 경우 출력 프레임에 경고 표시,
 
             ################################################################################################
 
@@ -165,7 +160,7 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
                 result, paying = kioskzoneenter(frame, iou, fps, width, paying_threshold, iou_threshold)
                 if result:
                     cv2.putText(frame, "Okay", (width - 400, 120), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-                result_queue.put((iou,result,paying,frame))
+                result_queue.put((iou,result,paying))
                     # kioskzoneenter 의 result 결괏값이 true 인 경우 (paying 시간이 설정 시간보다 큰 경우) 프레임에 표시
 
 

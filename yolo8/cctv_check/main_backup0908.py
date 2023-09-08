@@ -1,7 +1,6 @@
 import threading
 import queue
-import cv2
-import os
+import datetime
 from cctv_objectdetect import cctv_objectdetect
 
 # 변수를 저장하기 위한 전역 사전 생성
@@ -12,44 +11,18 @@ global_vars = {
     "recent_paying": 0,
     "paying_threshold": 5,
     "iou_threshold": 0.4,
-    'distance': False,
+    'distance': None,
     'human_inside' : False,
     'start_time' : None,
     'end_time' : None,
     'prev_inside' : False,
     'countobject' : False,
-    'weapon' : False,
 
 }
 payment_event = threading.Event()
 cross_event = threading.Event()
 move_event = threading.Event()
 collect_event = threading.Event()
-
-
-def weapon_situation(weapon_queue) :
-    frame_count = 0
-    while True:
-        try :
-            frame,global_vars['human_inside'] = weapon_queue.get()
-            frame_count += 1
-            print(global_vars['distance'])
-            if global_vars['distance'] :
-
-                print('무기 소지자 발생')
-
-                # countup 무기 소지자
-                global_vars['distance'] = False
-            else :
-                print('무기 발견')
-
-            # Save the frame as an image
-            image_filename = os.path.join('./weapon', f"frame_{frame_count}.jpg")
-            cv2.imwrite(image_filename, frame)
-
-        except :
-            print("새로운 결과가 아직 없습니다...")
-
 
 
 def check_crossing_line(cross_queue):
@@ -63,7 +36,7 @@ def check_crossing_line(cross_queue):
 
                 cross_event.set()
             elif global_vars['human_inside'] is False :
-                global_vars['distance'] = False
+                global_vars['distance'] = None
 
         except:
             print("새로운 결과가 아직 없습니다...")
@@ -94,11 +67,9 @@ def ObjectMoveCheck(object_queue):
 
 
 def collect_results(result_queue):
-    steal_frame = 0
-    payment_frame = 0
     while True:
         try:
-            iou, result, paying,frame = result_queue.get()
+            iou, result, paying = result_queue.get()
             move_event.wait()
 
             print(iou, result, paying)
@@ -106,10 +77,6 @@ def collect_results(result_queue):
                 if global_vars["start_time"] is None:
                     # global_vars["start_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     global_vars["start_time"] = 100
-                    payment_frame +=1
-                    image_filename = os.path.join('./payment', f"frame_{payment_frame}.jpg")
-                    cv2.imwrite(image_filename, frame)
-
                     #print(global_vars["start_time"],'start')
 
 
@@ -137,10 +104,6 @@ def collect_results(result_queue):
 
                 else :
                     print('계산하는 척 도난')
-                    steal_frame += 1
-                    # Save the frame as an image
-                    image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
-                    cv2.imwrite(image_filename, frame)
 
                     # countup_계산한척##########################################
 
@@ -149,10 +112,6 @@ def collect_results(result_queue):
             if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars["payment"] is False:
                 if global_vars['distance'] :
                     print('도망')
-                    steal_frame += 1
-                    # Save the frame as an image
-                    image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
-                    cv2.imwrite(image_filename, frame)
 
                     ## countup_튄놈###################################################
 
@@ -176,12 +135,10 @@ def collect_results(result_queue):
 
 
 def objectcount(count_queue):
-    count_frame = 0
     while True:
         try:
             object_name, number = count_queue.get()
             payment_event.wait()
-            count_frame +=1
             # print('갯수',global_vars["payment"])
             if global_vars['countobject']:
                 print(object_name,number,'물건')
@@ -193,11 +150,9 @@ def objectcount(count_queue):
                 #         # countup 물건 갯수
                 #
                 #     else :
-                       # print('도난')
                 #         # countup_개수안맞은놈#####################
                 #
                 # else :
-                    #print('도난')
                 #     # countup_개수안맞은놈######################
                 #########################################################################
 
@@ -213,26 +168,22 @@ if __name__ == "__main__":
     count_queue = queue.Queue()
     object_queue = queue.Queue()
     cross_queue = queue.Queue()
-    weapon_queue = queue.Queue()
 
     detect_thread = threading.Thread(target=cctv_objectdetect,
-                                     args=(result_queue, count_queue, object_queue, cross_queue,weapon_queue))
+                                     args=(result_queue, count_queue, object_queue, cross_queue))
     collect_result_thread = threading.Thread(target=collect_results, args=(result_queue,))
     count_thread = threading.Thread(target=objectcount, args=(count_queue,))
     object_thread = threading.Thread(target=ObjectMoveCheck, args=(object_queue,))
     cross_thread = threading.Thread(target=check_crossing_line, args=(cross_queue,))
-    weapon_thread =threading.Thread(target=weapon_situation, args=(weapon_queue,))
 
     detect_thread.start()
     collect_result_thread.start()
     count_thread.start()
     object_thread.start()
     cross_thread.start()
-    weapon_thread.start()
 
     detect_thread.join()
     collect_result_thread.join()
     count_thread.join()
     object_thread.join()
     cross_thread.join()
-    weapon_thread.join()
