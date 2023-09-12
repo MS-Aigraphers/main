@@ -53,7 +53,7 @@ def send_email(receiver, content, title):
 #
 #         # (*)메일의 발신자 메일 주소, 수신자 메일 주소, 앱비밀번호(발신자)
 #         sender = 'skcksdnr2@gmail.com'
-#         app_password = 'oqkolmjjmdvfaeny'
+#
 #
 #         msg = MIMEText(content)
 #         msg['Subject'] = title
