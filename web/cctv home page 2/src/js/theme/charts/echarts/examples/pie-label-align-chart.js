@@ -9,7 +9,7 @@ const pieLabelAlignChartInit = () => {
   const data = [
     {
       value: 850,
-      name: 'Starter',
+      name: '전기세',
       itemStyle: {
         color: rgbaColor(getColor('primary'), 0.5)
       }
