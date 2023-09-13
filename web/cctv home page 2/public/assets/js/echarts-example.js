@@ -4685,35 +4685,35 @@
             data: [
               {
                 value: 1200,
-                name: 'Facebook',
+                name: '아이스크림',
                 itemStyle: {
                   color: getColor('primary')
                 }
               },
               {
                 value: 1000,
-                name: 'Youtube',
+                name: '음료류',
                 itemStyle: {
                   color: getColor('danger')
                 }
               },
               {
                 value: 800,
-                name: 'Twitter',
+                name: '과자',
                 itemStyle: {
                   color: getColor('info')
                 }
               },
               {
                 value: 600,
-                name: 'Linkedin',
+                name: '라면',
                 itemStyle: {
                   color: getColor('success')
                 }
               },
               {
                 value: 400,
-                name: 'Github',
+                name: '생필품',
                 itemStyle: {
                   color: getColor('warning')
                 }
@@ -4793,35 +4793,35 @@
             data: [
               {
                 value: 1200,
-                name: 'Facebook',
+                name: '성인 남자',
                 itemStyle: {
                   color: getColor('primary')
                 }
               },
               {
                 value: 1000,
-                name: 'Youtube',
+                name: '성인 여자',
                 itemStyle: {
                   color: getColor('danger')
                 }
               },
               {
                 value: 800,
-                name: 'Twitter',
+                name: '남자 청소년',
                 itemStyle: {
                   color: getColor('info')
                 }
               },
               {
                 value: 600,
-                name: 'Linkedin',
+                name: '여자 청소년',
                 itemStyle: {
                   color: getColor('success')
                 }
               },
               {
                 value: 400,
-                name: 'Github',
+                name: '노인',
                 itemStyle: {
                   color: getColor('warning')
                 }
@@ -4884,35 +4884,35 @@
             data: [
               {
                 value: 1200,
-                name: 'Starter',
+                name: '오후 7시 ~ 오후 10시',
                 itemStyle: {
                   color: getColor('primary')
                 }
               },
               {
                 value: 1000,
-                name: 'Basic',
+                name: '오전 10시 ~ 오후 2시',
                 itemStyle: {
                   color: getColor('danger')
                 }
               },
               {
                 value: 800,
-                name: 'Optimal',
+                name: '새벽 시간',
                 itemStyle: {
                   color: getColor('info')
                 }
               },
               {
                 value: 600,
-                name: 'Business',
+                name: '아침 일찍',
                 itemStyle: {
                   color: getColor('success')
                 }
               },
               {
                 value: 400,
-                name: 'Premium',
+                name: '저녁 늦게',
                 itemStyle: {
                   color: getColor('warning')
                 }
@@ -4961,42 +4961,42 @@
     const data1 = [
       {
         value: 1048,
-        name: 'Starter',
+        name: '마켓 컬리',
         itemStyle: {
           color: getColor('danger')
         }
       },
       {
         value: 735,
-        name: 'Basic',
+        name: '쿠팡',
         itemStyle: {
           color: getColor('primary')
         }
       },
       {
         value: 580,
-        name: 'Optimal',
+        name: '지마켓',
         itemStyle: {
           color: getColor('secondary')
         }
       },
       {
         value: 484,
-        name: 'Business',
+        name: '기타 1',
         itemStyle: {
           color: getColor('warning')
         }
       },
       {
         value: 300,
-        name: 'Premium',
+        name: '기타 2',
         itemStyle: {
           color: getColor('success')
         }
       },
       {
         value: 300,
-        name: 'Platinum',
+        name: '기타 3',
         itemStyle: {
           color: getColor('info')
         }
@@ -5006,35 +5006,35 @@
     const data2 = [
       {
         value: 1048,
-        name: 'Facebook',
+        name: '쿠팡',
         itemStyle: {
           color: getColor('primary')
         }
       },
       {
         value: 735,
-        name: 'Youtube',
+        name: '마켓 컬리',
         itemStyle: {
           color: getColor('danger')
         }
       },
       {
         value: 580,
-        name: 'Twitter',
+        name: '지마켓',
         itemStyle: {
           color: getColor('info')
         }
       },
       {
         value: 484,
-        name: 'Linkedin',
+        name: '기타 1',
         itemStyle: {
           color: getColor('success')
         }
       },
       {
         value: 300,
-        name: 'Github',
+        name: '기타 2',
         itemStyle: {
           color: getColor('warning')
         }
@@ -5047,7 +5047,7 @@
       const getDefaultOptions = () => ({
         title: [
           {
-            text: 'Pie Multiple Chart',
+            text: '상세 유형',
             left: 'center',
             textStyle: {
               color: getColor('gray-600')
@@ -5113,63 +5113,63 @@
     const data = [
       {
         value: 850,
-        name: 'Starter',
+        name: '전기세',
         itemStyle: {
           color: rgbaColor(getColor('primary'), 0.5)
         }
       },
       {
         value: 750,
-        name: 'Starter Pro',
+        name: '임대료',
         itemStyle: {
           color: getColor('danger')
         }
       },
       {
         value: 457,
-        name: 'Basic',
+        name: '관리비',
         itemStyle: {
           color: getColor('primary')
         }
       },
       {
         value: 654,
-        name: 'Optimal',
+        name: '물품 구입비 1',
         itemStyle: {
           color: getColor('secondary')
         }
       },
       {
         value: 447,
-        name: 'Business',
+        name: '매장 홍보비',
         itemStyle: {
           color: getColor('warning')
         }
       },
       {
         value: 682,
-        name: 'Classic addition',
+        name: '물품 구입비 2',
         itemStyle: {
           color: rgbaColor(getColor('warning'), 0.8)
         }
       },
       {
         value: 471,
-        name: 'Premium',
+        name: '시설 관리비',
         itemStyle: {
           color: getColor('success')
         }
       },
       {
         value: 524,
-        name: 'Platinum',
+        name: '물품 구입비 3',
         itemStyle: {
           color: getColor('info')
         }
       },
       {
         value: 200,
-        name: 'Platinum Pro',
+        name: '택배 수수료',
         itemStyle: {
           color: rgbaColor(getColor('primary'), 0.5)
         }
@@ -5182,19 +5182,10 @@
       const getDefaultOptions = () => ({
         title: [
           {
-            text: 'Pie Label Align Chart',
+            text: '상세 유형',
             left: 'center',
             textStyle: {
               color: getColor('gray-600')
-            }
-          },
-          {
-            subtext: 'alignTo: "labelLine"',
-            left: '50%',
-            top: '85%',
-            textAlign: 'center',
-            subtextStyle: {
-              color: getColor('gray-700')
             }
           }
         ],
@@ -5271,63 +5262,63 @@
     const data = [
       {
         value: 850,
-        name: 'Starter',
+        name: '전기세',
         itemStyle: {
           color: rgbaColor(getColor('primary'), 0.5)
         }
       },
       {
         value: 750,
-        name: 'Starter Pro',
+        name: '임대료',
         itemStyle: {
           color: getColor('danger')
         }
       },
       {
         value: 457,
-        name: 'Basic',
+        name: '관리비',
         itemStyle: {
           color: getColor('primary')
         }
       },
       {
         value: 654,
-        name: 'Optimal',
+        name: '물품 구입비 1',
         itemStyle: {
           color: getColor('secondary')
         }
       },
       {
         value: 447,
-        name: 'Business',
+        name: '매장 홍보비',
         itemStyle: {
           color: getColor('warning')
         }
       },
       {
         value: 682,
-        name: 'Classic addition',
+        name: '물품 구입비 2',
         itemStyle: {
           color: rgbaColor(getColor('warning'), 0.8)
         }
       },
       {
         value: 471,
-        name: 'Premium',
+        name: '시설 관리비',
         itemStyle: {
           color: getColor('success')
         }
       },
       {
         value: 524,
-        name: 'Platinum',
+        name: '물품 구입비 3',
         itemStyle: {
           color: getColor('info')
         }
       },
       {
         value: 200,
-        name: 'Platinum Pro',
+        name: '택배 수수료',
         itemStyle: {
           color: rgbaColor(getColor('primary'), 0.5)
         }
@@ -5340,19 +5331,10 @@
       const getDefaultOptions = () => ({
         title: [
           {
-            text: 'Pie Edge Align Chart',
+            text: '상세 유형',
             left: 'center',
             textStyle: {
               color: getColor('gray-600')
-            }
-          },
-          {
-            subtext: 'alignTo: "edge"',
-            left: '50%',
-            top: '85%',
-            textAlign: 'center',
-            subtextStyle: {
-              color: getColor('gray-700')
             }
           }
         ],
@@ -5526,7 +5508,8 @@
             type: 'gauge',
             center: ['50%', '60%'],
             radius: '100%',
-            startAngle: 180,
+            
+            Angle: 180,
             endAngle: 0,
             progress: {
               show: true,
