@@ -14,30 +14,33 @@ app_password = secrets_data.get("APP_PASSWORD")
 print("APP_PASSWORD 값:", app_password)
 
 
-def send_email(receiver, content, title):
-    receiver = receiver
-    content = f'{title} 문제가 발생 하였습니다. 자세한 내용은 {content}에서 확인해주세요'
+def send_email(receivers, content, title, start_time):
+    start_time = start_time
     title = title
 
+    for receiver in receivers:
+        content = f'{start_time}에 {title} 문제가 발생 하였습니다. 자세한 내용은 {content}에서 확인해주세요'
+
+
     # (*)메일의 발신자 메일 주소, 수신자 메일 주소, 앱비밀번호(발신자)
-    sender = 'skcksdnr2@gmail.com'
+        sender = 'skcksdnr2@gmail.com'
 
 
-    msg = MIMEText(content)
-    msg['Subject'] = title
-    # 세션 생성
-    try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as s:
-            # TLS 암호화
-            s.starttls()
+        msg = MIMEText(content)
+        msg['Subject'] = title
+        # 세션 생성
+        try:
+            with smtplib.SMTP('smtp.gmail.com', 587) as s:
+                # TLS 암호화
+                s.starttls()
 
-            # 로그인 인증과 메일 보내기
-            s.login(sender, app_password)
-            s.sendmail(sender, receiver, msg.as_string())
-            print("이메일이 성공적으로 전송되었습니다.")
+                # 로그인 인증과 메일 보내기
+                s.login(sender, app_password)
+                s.sendmail(sender, receiver, msg.as_string())
+                print(f"{receiver}에게 이메일이 성공적으로 전송되었습니다.")
 
-    except Exception as e:
-        print(f"이메일 전송 중 오류 발생: {e}")
+        except Exception as e:
+            print(f"이메일 전송 중 오류 발생: {e}")
 
 
 # class Test:
