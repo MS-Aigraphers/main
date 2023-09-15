@@ -82,7 +82,13 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
 
         ##################################################################
         # # 가로 라인을 프레임에 그립니다.
-        # cv2.line(frame, line[0], line[1], (0, 0, 255), 2)  # 빨간색으로 라인을 그립니다.
+        cv2.line(frame, line[0], line[1], (0, 0, 255), 2)  # 빨간색으로 라인을 그립니다.
+
+        # Draw a rectangle around the kiosk_coords
+        cv2.rectangle(frame, (kiosk_coords[0][0], kiosk_coords[0][1]), (kiosk_coords[2][0], kiosk_coords[2][1]),
+                      (0, 255, 0), 2)
+        cv2.putText(frame, 'Kiosk Zone', (kiosk_coords[0][0] + 10, kiosk_coords[0][1] + 30), cv2.FONT_HERSHEY_SIMPLEX,
+                    1, (0, 255, 0), 2)
 
         # Human 객체의 bbox 중심 위치 추적 및 라인 통과 여부 확인
         current_status = "None"  # 현재 프레임의 상태를 저장하는 변수
@@ -99,6 +105,8 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
             if class_name == "6: Weapon" and confidence < 0.7:
                 continue
             elif class_name == "0 : Human" and confidence < 0.3:
+                continue
+            elif class_name == "5 : Bag" and confidence < 1 :
                 continue
             elif confidence < 0.5:
                 continue

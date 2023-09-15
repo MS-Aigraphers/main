@@ -1,8 +1,11 @@
 import threading
 import queue
 import cv2
-import os
 from cctv_objectdetect import cctv_objectdetect
+from mailsend import *
+import os
+# from views import *
+# from web.home.models import Kiosk  # 장고 모델 불러오기
 
 # 변수를 저장하기 위한 전역 사전 생성
 global_vars = {
@@ -19,6 +22,7 @@ global_vars = {
     'prev_inside' : False,
     'countobject' : False,
     'weapon' : False,
+    'order_number' : 0,
 
 }
 payment_event = threading.Event()
@@ -123,6 +127,10 @@ def collect_results(result_queue):
             if global_vars["start_time"] is not None and global_vars["end_time"] is not None:
                 print(global_vars["start_time"], global_vars["end_time"])
 
+                # # Django 모델에서 레코드의 id를 기반으로 payment_time 값을 가져옵니다.
+                # kiosk_record = Kiosk.objects.get(id=1)  # 원하는 레코드의 id로 1을 대체하세요.
+                # db_time = kiosk_record.payment_time
+
                 db_time = 130  # db에서 받아올 데이터
                 if global_vars["start_time"] <db_time and db_time <global_vars["end_time"] :
                     print('결제 완료')
@@ -137,6 +145,7 @@ def collect_results(result_queue):
 
                 else :
                     print('계산하는 척 도난')
+                    send_email(receiver='onekid2@naver.com', content='naver.com', title='미결제')
                     steal_frame += 1
                     # Save the frame as an image
                     image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
@@ -149,6 +158,7 @@ def collect_results(result_queue):
             if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars["payment"] is False:
                 if global_vars['distance'] :
                     print('도망')
+                    send_email(receiver='onekid2@naver.com', content='naver.com', title='미결제')
                     steal_frame += 1
                     # Save the frame as an image
                     image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
@@ -182,22 +192,25 @@ def objectcount(count_queue):
             object_name, number = count_queue.get()
             payment_event.wait()
             count_frame +=1
+            # kiosk_record = Kiosk.objects.get(store_name='store1')
             # print('갯수',global_vars["payment"])
             if global_vars['countobject']:
                 print(object_name,number,'물건')
 
                 # 물건 이름 , 갯수 db 추가 부분##############################################
-                # if object_name == db 물건 이름 :
-                #     if number == db 물건 갯수 :
+                # if object_name == kiosk_record.object_label :
+                #     if number == kiosk_record.object_count :
                 #         print('정상 결제')
+                #         global_vars['order_number'] += 1
+                #         create_sales_record(global_vars['order_number'],object_name,number,'store1')
                 #         # countup 물건 갯수
                 #
                 #     else :
-                       # print('도난')
+                #        print('도난')
                 #         # countup_개수안맞은놈#####################
                 #
                 # else :
-                    #print('도난')
+                #     print('도난')
                 #     # countup_개수안맞은놈######################
                 #########################################################################
 
