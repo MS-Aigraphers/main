@@ -125,3 +125,21 @@ class Emergency :
 
 
 
+######### 테스트 ########
+
+# 클래스 인스턴스 생성
+emergency_instance = Emergency()
+
+# 사건 기록 (예시)
+emergency_instance.record_incident("fire")
+emergency_instance.record_incident("weapon")
+emergency_instance.record_incident("fire")
+
+# 특정 날짜 구간 설정
+start_date = datetime.datetime(2023, 9, 1)  # 시작 날짜
+end_date = datetime.datetime(2023, 9, 20)  # 종료 날짜
+
+# 사건 카운트 출력 (특정 날짜 구간 내의 사건만 고려)
+print(emergency_instance.incident_counter(start_date, end_date))
+
+######### 테스트 ########
