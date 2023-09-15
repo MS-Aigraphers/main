@@ -1,4 +1,3 @@
-from typing import Any
 import datetime
 
 class Emergency :
@@ -143,3 +142,47 @@ end_date = datetime.datetime(2023, 9, 20)  # 종료 날짜
 print(emergency_instance.incident_counter(start_date, end_date))
 
 ######### 테스트 ########
+
+
+
+# 신고 기능
+class Report :
+    
+    def __init__(self) -> None:
+        # 대충 신고 유형 리스트
+        self.incident_types = list(set(incident["type"] for incident in Emergency.incidents))
+        
+        self.reports = {} # 신고 목록을 위한 빈 딕셔너리
+        
+    
+    
+    # 신고 유형을 저장된 리스트에서 출력
+    def select_incident_type(self):
+        for i, incident_type in enumerate(self.incident_types, start=1):
+            print(f"{i}. {incident_type}")
+
+        while True:
+            valid_choices = [str(i) for i in range(1, len(self.incident_types) + 1)]
+            choice = input(f'선택 ({"/".join(valid_choices)}): ')
+            if choice in valid_choices:
+                return self.incident_types[int(choice) - 1]
+            else:
+                print("올바른 선택을 입력하세요.")
+
+
+    # 상세 신고 내용 적을 수 있게
+    def submit_report(self):
+        incident_type = self.select_incident_type()  # 신고 유형 선택
+        report_text = input("신고 내용을 입력하세요: ") # 빠른 이해를 위한 적당한 문장
+        self.reports.append({"type": incident_type, "text": report_text, "date" : datetime.datetime.now()}) # 사건 종류, 신고 내용, 신고 시간
+        print("신고가 제출되었습니다.") # 고객의 안심을 위한 보고
+
+
+    # 신고를 끝마친 뒤 해당 신고 내역을 볼 수 있도록, 그냥 예시로 적어둔 내용
+    def view_reports(self):
+        print("신고 목록:")
+        for i, report in enumerate(self.reports, start=1):
+            print(f"{i}. 신고 유형: {report['type']}")
+            print(f"   내용: {report['text']}")
+            
+    # 신고내역 삭제기능은 del 하나로 해결될 것 같으니 미작성

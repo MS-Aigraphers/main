@@ -1,4 +1,3 @@
-from typing import Any
 import datetime
 
 class Emergency :
@@ -52,35 +51,42 @@ class Emergency :
             
             
 # dict 저장방식2 : 화재, 무장 이외의 경우 도입 쉬움 if문 추가 필요 X
-    def record_incident(self, incident_type):
+    def record_incident(self, incident_type, record_time, img, msg):
         
         # 각종 조건들
         # if emergency.check : 
         # if incident_type in ["fire", "weapon"]: 
         # if DB 신호
             self.incidents.append({
-                "type": incident_type,
-                "datetime": datetime.datetime.now()
+                "type": incident_type, #사건 종류
+                "datetime": record_time, # 사건 발생 시간
+                "highlight" : img, # 하이라이트 이미지
+                "msg" : msg # 메세지 발송 여부
+                
             })
 
 
 # --------------------------
 
 # dict 받아오는 경우
-    def get_record(self, incident_type, record_time): # 사건 종류, 시간
+    def get_record(self, incident_type, record_time, img, msg): # 사건 종류, 시간, 영상, 메세지 발송 여부
             self.incidents.append({
                 "type": incident_type,
-                "datetime": record_time
+                "datetime": record_time,
+                "highlight" : img,
+                "msg" : msg
             })
 
             
 # db 수정
-    def edit_record(self, idx, edit_type, edit_time) : # idx = 인덱스, edit_type = 사건 수정, edit_time : 시간 수정
+    def edit_record(self, idx, edit_type, edit_time, img, msg) : # idx = 인덱스, edit_type = 사건 수정, edit_time : 시간 수정
         
         # 새 딕셔너리 생성
         edit_data = {
             "type": edit_type,
-            "datetime": edit_time
+            "datetime": edit_time,
+            "highlight" : img,
+            "msg" : msg
         }
         
         # 해당 인덱스 딕셔너리 교체
@@ -124,4 +130,44 @@ class Emergency :
 
 
 
+# 신고 기능
+class Report :
+    
+    def __init__(self) -> None:
+        # 대충 신고 유형 리스트
+        self.incident_types = list(set(incident["type"] for incident in Emergency.incidents))
+        
+        self.reports = {} # 신고 목록을 위한 빈 딕셔너리
+        
+    
+    
+    # 신고 유형을 저장된 리스트에서 출력
+    def select_incident_type(self):
+        for i, incident_type in enumerate(self.incident_types, start=1):
+            print(f"{i}. {incident_type}")
 
+        while True:
+            valid_choices = [str(i) for i in range(1, len(self.incident_types) + 1)]
+            choice = input(f'선택 ({"/".join(valid_choices)}): ')
+            if choice in valid_choices:
+                return self.incident_types[int(choice) - 1]
+            else:
+                print("올바른 선택을 입력하세요.")
+
+
+    # 상세 신고 내용 적을 수 있게
+    def submit_report(self):
+        incident_type = self.select_incident_type()  # 신고 유형 선택
+        report_text = input("신고 내용을 입력하세요: ") # 빠른 이해를 위한 적당한 문장
+        self.reports.append({"type": incident_type, "text": report_text, "date" : datetime.datetime.now()}) # 사건 종류, 신고 내용, 신고 시간
+        print("신고가 제출되었습니다.") # 고객의 안심을 위한 보고
+
+
+    # 신고를 끝마친 뒤 해당 신고 내역을 볼 수 있도록, 그냥 예시로 적어둔 내용
+    def view_reports(self):
+        print("신고 목록:")
+        for i, report in enumerate(self.reports, start=1):
+            print(f"{i}. 신고 유형: {report['type']}")
+            print(f"   내용: {report['text']}")
+            
+    # 신고내역 삭제기능은 del 하나로 해결될 것 같으니 미작성
