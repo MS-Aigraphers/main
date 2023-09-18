@@ -7,15 +7,15 @@ from kiosk import kioskzoneenter
 from kiosk import countobject
 from collections import Counter
 from distance_check import check_distance_between_objects
-import os
+
 import datetime
 
 def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_queue):
 
     ########################## <영상 추출 부분> #################################
 
-    cap = cv2.VideoCapture("./cctv_videodata/1.mp4")
-    model_detect = YOLO('./08291455.pt')
+    cap = cv2.VideoCapture("./cctv_videodata/weapon_Sequence.mp4")
+    model_detect = YOLO('./best.pt')
     fps = cap.get(cv2.CAP_PROP_FPS)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -81,14 +81,14 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
         classes_detect = np.array(result_detect.boxes.cls.cpu(), dtype="int")
 
         ##################################################################
-        # 가로 라인을 프레임에 그립니다.
-        cv2.line(frame, line[0], line[1], (0, 0, 255), 2)  # 빨간색으로 라인을 그립니다.
-
-        # Draw a rectangle around the kiosk_coords
-        cv2.rectangle(frame, (kiosk_coords[0][0], kiosk_coords[0][1]), (kiosk_coords[2][0], kiosk_coords[2][1]),
-                      (0, 255, 0), 2)
-        cv2.putText(frame, 'Kiosk Zone', (kiosk_coords[0][0] + 10, kiosk_coords[0][1] + 30), cv2.FONT_HERSHEY_SIMPLEX,
-                    1, (0, 255, 0), 2)
+        # # 가로 라인을 프레임에 그립니다.
+        # cv2.line(frame, line[0], line[1], (0, 0, 255), 2)  # 빨간색으로 라인을 그립니다.
+        #
+        # # Draw a rectangle around the kiosk_coords
+        # cv2.rectangle(frame, (kiosk_coords[0][0], kiosk_coords[0][1]), (kiosk_coords[2][0], kiosk_coords[2][1]),
+        #               (0, 255, 0), 2)
+        # cv2.putText(frame, 'Kiosk Zone', (kiosk_coords[0][0] + 10, kiosk_coords[0][1] + 30), cv2.FONT_HERSHEY_SIMPLEX,
+        #             1, (0, 255, 0), 2)
 
         # Human 객체의 bbox 중심 위치 추적 및 라인 통과 여부 확인
         current_status = "None"  # 현재 프레임의 상태를 저장하는 변수
@@ -151,8 +151,8 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
 
 
                 iou = calculate_iou(kiosk_bbox, person_bbox)
-                iou_text = f'IOU: {iou:.2f}'
-                cv2.putText(frame, iou_text, (width - 200, 40), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
+                # iou_text = f'IOU: {iou:.2f}'
+                # cv2.putText(frame, iou_text, (width - 200, 40), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
                 # 사람일 경우 미리 설정된 kiosk_bbox 와의 iou 계산 및 출력 프레임에 표시
 
                 # 다른 객체와의 거리 계산
@@ -207,7 +207,6 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
                 value = object_values[i]
             object_types.append([key, value])
 
-
             # print(object_types) # ex (drink,3)
 
         ############################# 객체 카운팅 이후 갯수 판단 로직 부분 #################################
@@ -261,11 +260,7 @@ def cctv_objectdetect(result_queue,count_queue,object_queue,cross_queue,weapon_q
                     if max_above_threshold_class is None:
                         max_above_threshold_class = max_percentage_object_class_int
 
-                    cv2.putText(frame, f"{object_types[0][0]},{max_above_threshold_class}", (width - 400, 140),
-                                cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-
-                    count_queue.put((object_types[0][0],max_above_threshold_class,frame))
-
+                    count_queue.put((object_types[0][0],max_above_threshold_class))
 
                     # 파일에 기록
                     # with open(filename, "a") as text_file:

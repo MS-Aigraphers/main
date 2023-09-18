@@ -1,7 +1,7 @@
 import threading
 import queue
 import cv2
-from cctv_objectdetect import cctv_objectdetect
+from cctv_objectdetect_weapon import cctv_objectdetect
 from mailsend import *
 import os
 from datetime import datetime
@@ -31,14 +31,12 @@ global_vars = {
     'countobject' : False,
     'weapon' : False,
     'order_number' : 0,
-    'video_end' : False
 
 }
 payment_event = threading.Event()
 cross_event = threading.Event()
 move_event = threading.Event()
 collect_event = threading.Event()
-
 
 
 def weapon_situation(weapon_queue) :
@@ -62,7 +60,7 @@ def weapon_situation(weapon_queue) :
 
 
             # Save the frame as an image
-            image_filename = os.path.join('./weapon', f"frame_{datetime.now()}.jpg")
+            image_filename = os.path.join('./weapon', f"frame_{frame_count}.jpg")
             cv2.imwrite(image_filename, frame)
 
         except :
@@ -125,8 +123,7 @@ def collect_results(result_queue):
                     # global_vars["start_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     global_vars["start_time"] = 100
                     payment_frame +=1
-                    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                    image_filename = os.path.join('./payment', f"payment_{timestamp}.jpg")
+                    image_filename = os.path.join('./payment', f"frame_{payment_frame}.jpg")
                     cv2.imwrite(image_filename, frame)
 
                     #print(global_vars["start_time"],'start')
@@ -159,14 +156,12 @@ def collect_results(result_queue):
                     payment_event.set()
 
                 else :
-                    print('결제하는 척 도난')
-                    send_email(receivers, content='naver.com', title='도난(미결제)',start_time=datetime.now())
+                    print('계산하는 척 도난')
+                    send_email(receiver='onekid2@naver.com', content='naver.com', title='미결제')
                     steal_frame += 1
                     # Save the frame as an image
-                    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                    image_filename = os.path.join('./steal', f"steal_{timestamp}.jpg")
+                    image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
                     cv2.imwrite(image_filename, frame)
-
 
                     # countup_계산한척##########################################
 
@@ -175,10 +170,10 @@ def collect_results(result_queue):
             if global_vars['prev_inside'] is True and global_vars['human_inside'] is False and global_vars["payment"] is False:
                 if global_vars['distance'] :
                     print('도망')
-                    send_email(receivers, content='naver.com', title='도난(도망)',start_time=datetime.now())
+                    send_email(receiver='onekid2@naver.com', content='naver.com', title='미결제')
+                    steal_frame += 1
                     # Save the frame as an image
-                    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                    image_filename = os.path.join('./steal', f"steal_{timestamp}.jpg")
+                    image_filename = os.path.join('./steal', f"frame_{steal_frame}.jpg")
                     cv2.imwrite(image_filename, frame)
 
                     ## countup_튄놈###################################################
@@ -203,37 +198,32 @@ def collect_results(result_queue):
 
 
 def objectcount(count_queue):
+    count_frame = 0
     while True:
         try:
-            object_name, number,frame = count_queue.get()
+            object_name, number = count_queue.get()
             payment_event.wait()
+            count_frame +=1
             # kiosk_record = Kiosk.objects.get(store_name='store1')
             # print('갯수',global_vars["payment"])
             if global_vars['countobject']:
                 print(object_name,number,'물건')
-                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                image_filename = os.path.join('./payment', f"count_{timestamp},{object_name}_{number}.jpg")
-                print(image_filename)
-                print(frame)
-                cv2.imwrite(image_filename, frame)
 
                 # 물건 이름 , 갯수 db 추가 부분##############################################
-                if object_name == 'Drink':
-                    if number == 3 :
-                        print('정상 결제')
-                        global_vars['order_number'] += 1
-                        # create_sales_record(global_vars['order_number'],object_name,number,'store1')
-                        # countup 물건 갯수
-
-
-                    else :
-                       print('도난')
-                       send_email(receivers, content='naver.com', title='도난(갯수 다름)', start_time=datetime.now())
-                        # countup_개수안맞은놈#####################
-
-                else :
-                    print('도난')
-                    # countup_개수안맞은놈######################
+                # if object_name == kiosk_record.object_label :
+                #     if number == kiosk_record.object_count :
+                #         print('정상 결제')
+                #         global_vars['order_number'] += 1
+                #         create_sales_record(global_vars['order_number'],object_name,number,'store1')
+                #         # countup 물건 갯수
+                #
+                #     else :
+                #        print('도난')
+                #         # countup_개수안맞은놈#####################
+                #
+                # else :
+                #     print('도난')
+                #     # countup_개수안맞은놈######################
                 #########################################################################
 
 
